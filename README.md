@@ -34,6 +34,21 @@
 
 ---
 
+## 📲 دانلود APK آماده (مدیرمن اندروید)
+
+فایل نصبی آماده اندروید در همین ریپو موجود است:
+
+| فایل | توضیح |
+|---|---|
+| [`apk/modirman-v1.0.apk`](apk/modirman-v1.0.apk) | نصبی مستقیم روی گوشی (اندروید ۷ به بالا، حجم ~۱۶۰KB) |
+| [`android-app/`](android-app/) | سورس کامل اپ اندروید + اسکریپت ساخت (`build.sh`) + keystore امضا |
+
+- 📥 **نصب سریع:** فایل APK را دانلود و روی گوشی باز کنید (اجازه «نصب از منابع ناشناس» را بدهید)
+- 🏪 این APK دقیقاً همان فایلی است که می‌توانید در کافه‌بازار منتشر کنید (targetSdk 34 مطابق سیاست بازار)
+- ⚠️ اپ اندروید، آدرس `https://homeiotnt.ir/` را باز می‌کند؛ بعد از دپلوی وب‌اپ روی آدرس نهایی، آن را در `MainActivity.java` ویرایش و دوباره بسازید (راهنمای کامل: [`android-app/README.md`](android-app/README.md))
+
+---
+
 ## 🚀 اجرای محلی (Local)
 
 پیش‌نیازها: [Node.js 20+](https://nodejs.org) و [Bun](https://bun.sh) (یا npm/pnpm)
@@ -112,6 +127,8 @@ git push -u origin main
 - بعد از هاست، آدرسی مثل `https://modirman.example.ir` خواهید داشت
 
 ### مرحله ۲ — ساخت APK از نوع WebView
+> 💡 **خبر خوب:** APK آماده و امضاشده در پوشه [`apk/`](apk/) همین ریپو موجود است و سورس کامل آن هم در [`android-app/`](android-app/) قرار دارد — نیازی به انجام مراحل زیر نیست مگر بخواهید تغییراتی بدهید. راهنمای اختصاصی: [`android-app/README.md`](android-app/README.md)
+
 **سریع‌ترین روش (Android Studio):**
 1. [Android Studio](https://developer.android.com/studio) را نصب کنید
 2. پروژه جدید با قالب **Empty Views Activity** بسازید

@@ -1,0 +1,4 @@
+build/
+classlist.txt
+*.apk
+*.idsig
