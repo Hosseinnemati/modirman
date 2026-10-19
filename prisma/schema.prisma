@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// کاربران (مدیر و ساکنین)
+model User {
+  id         String   @id @default(cuid())
+  username   String   @unique
+  password   String
+  name       String
+  role       String   @default("resident") // manager | resident
+  unitNumber String? // شماره واحد
+  floor      Int? // طبقه
+  phone      String   @unique // شماره موبایل (الزامی و یکتا — ورود با موبایل)
+  status     String   @default("active") // unassigned | active | inactive
+  createdAt  DateTime @default(now())
+
+  receipts  Receipt[]
+  reminders Reminder[]
+}
+
+// یادآورهای شخصی و ساختمانی
+model Reminder {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  date        String // Jalali 'YYYY-MM-DD'
+  time        String? // 'HH:mm'
+  type        String   @default("personal") // personal | building
+  createdAt   DateTime @default(now())
+}
+
+// اعلان‌ها و اطلاعیه‌ها
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  type      String   @default("general") // meeting | water | cleaning | elevator | security | general
+  date      String // تاریخ نمایش (شمسی)
+  time      String // ساعت نمایش
+  createdAt DateTime @default(now())
+}
+
+// قبض‌ها و شارژها
+model Bill {
+  id         String    @id @default(cuid())
+  title      String
+  amount     Int // مبلغ به تومان
+  unitNumber String // شماره واحد
+  dueDate    String // تاریخ سررسید (شمسی)
+  status     String    @default("pending") // pending | paid
+  paidAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  receipts Receipt[]
+}
+
+// رسیدهای پرداخت آپلودشده توسط ساکنین
+model Receipt {
+  id               String    @id @default(cuid())
+  billId           String
+  bill             Bill      @relation(fields: [billId], references: [id], onDelete: Cascade)
+  uploadedByUserId String?
+  uploadedBy       User?     @relation(fields: [uploadedByUserId], references: [id], onDelete: SetNull)
+  amount           Int
+  image            String
+  note             String?
+  status           String    @default("pending") // pending | approved | rejected
+  createdAt        DateTime  @default(now())
+}
+
+// درخواست‌های تعمیرات و خدمات
+model ServiceRequest {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  unitNumber  String
+  category    String   @default("repair") // repair | plumbing | electrical | cleaning | other
+  priority    String   @default("medium") // high | medium | low
+  status      String   @default("in_progress") // in_progress | done
+  createdAt   DateTime @default(now())
+}
+
+// تنظیمات ساختمان
+model Building {
+  id         Int    @id @default(autoincrement())
+  name       String
+  address    String
+  units      Int    @default(20)
+  cardNumber String @default("") // شماره کارت بانکی (بدون فاصله و خط تیره)
+  cardHolder String @default("") // نام صاحب کارت
+  sheba      String @default("") // شماره شبا (IR...)
+}
