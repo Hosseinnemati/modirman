@@ -1,52 +1,48 @@
 package ir.homeiotnt.modirman;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.WebView.WebViewTransport;
+import android.widget.Toast;
 
 /**
- * مدیرمن — اپلیکیشن مدیریت هوشمند ساختمان
- * پوسته WebView برای اپلیکیشن وب Next.js
+ * مدیرمن — اپلیکیشن مدیریت هوشمند ساختمان (نسخه آفلاین)
+ * کل برنامه و داده‌ها داخل خود گوشی ذخیره می‌شود؛ بدون نیاز به اینترنت و هاست.
  *
- * تغییر آدرس اپ: فقط مقدار BASE_URL را عوض کنید و دوباره بسازید (build.sh)
+ * ── حالت آنلاین (اختیاری) ──
+ * اگر خواستید اپ به وب‌اپ روی هاست وصل شود، مقدار ONLINE_URL را آدرس سایت
+ * بگذارید و در onCreate مقدار START_URL را روی ONLINE_URL تغییر دهید.
  */
 public class MainActivity extends Activity {
 
-    /** آدرس اپلیکیشن وب — بعد از دپلوی، اینجا را ویرایش کنید */
-    public static final String BASE_URL = "https://homeiotnt.ir/";
+    /** آدرس اپ آفلاین — داخل خود APK (تغییر ندهید) */
+    private static final String OFFLINE_URL = "file:///android_asset/www/index.html";
 
-    /** هاست‌های مجاز برای باز شدن داخل اپ (بقیه لینک‌ها در مرورگر باز می‌شوند) */
-    private static final String[] ALLOWED_HOSTS = {
-            "homeiotnt.ir",
-            "www.homeiotnt.ir"
-    };
+    /** برای حالت آنلاین: آدرس وب‌اپ دپلوی‌شده را اینجا بگذارید */
+    private static final String ONLINE_URL = "https://homeiotnt.ir/";
 
-    private static final int FILE_CHOOSER_CODE = 1001;
-    private static final int NOTIF_PERMISSION_CODE = 2001;
+    /** نقطه شروع اپ: آفلاین یا آنلاین */
+    private static final String START_URL = OFFLINE_URL;
 
     private WebView web;
-    private ValueCallback<Uri[]> filePathCallback;
-    private boolean loadError = false;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         web = new WebView(this);
         setContentView(web);
 
-        // رنگ نوار وضعیت هم‌رنگ تم آبی اپ
         getWindow().setStatusBarColor(Color.parseColor("#2563eb"));
         getWindow().setNavigationBarColor(Color.parseColor("#f8fafc"));
 
@@ -54,7 +50,7 @@ public class MainActivity extends Activity {
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
         s.setDatabaseEnabled(true);
-        s.setAllowFileAccess(false);
+        s.setAllowFileAccess(true);          // برای بارگذاری assets داخلی
         s.setAllowContentAccess(false);
         s.setSupportZoom(false);
         s.setMediaPlaybackRequiresUserGesture(false);
@@ -64,107 +60,58 @@ public class MainActivity extends Activity {
         web.setBackgroundColor(Color.parseColor("#f8fafc"));
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
+        web.addJavascriptInterface(new AndroidBridge(), "AndroidBridge");
+
         web.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                Uri uri = request.getUrl();
-                String scheme = uri.getScheme() == null ? "" : uri.getScheme();
-                // لینک‌های تلفن/ایمیل/پیامک با اپ مرتبط باز شوند
-                if (scheme.equals("tel") || scheme.equals("mailto") || scheme.equals("sms")) {
-                    try {
-                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                    } catch (Exception ignored) { }
-                    return true;
-                }
-                if (!scheme.equals("http") && !scheme.equals("https")) return true;
-                // هاست‌های خارجی در مرورگر باز می‌شوند
-                return !isAllowedHost(uri.getHost());
-            }
-
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                if (request.isForMainFrame()) {
-                    loadError = true;
-                    showOfflinePage();
-                }
+            public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
+                // همه ناوبری‌ها داخل همان اپ می‌ماند (اپ آفلاین تک‌صفحه‌ای است)
+                return false;
             }
         });
-
-        web.setWebChromeClient(new WebChromeClient() {
-            // پشتیبانی از بارگذاری تصویر رسید پرداخت
-            @Override
-            public boolean onShowFileChooser(WebView wv, ValueCallback<Uri[]> callback,
-                                             FileChooserParams params) {
-                if (filePathCallback != null) filePathCallback.onReceiveValue(null);
-                filePathCallback = callback;
-                try {
-                    Intent intent = params.createIntent();
-                    intent.setType("image/*");
-                    startActivityForResult(intent, FILE_CHOOSER_CODE);
-                } catch (Exception e) {
-                    filePathCallback = null;
-                    return false;
-                }
-                return true;
-            }
-        });
-
-        // مجوز نوتیفیکیشن در اندروید ۱۳ به بعد به‌صورت runtime است
-        if (Build.VERSION.SDK_INT >= 33) {
-            requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"},
-                    NOTIF_PERMISSION_CODE);
-        }
 
         if (savedInstanceState != null) {
             web.restoreState(savedInstanceState);
         } else {
-            web.loadUrl(BASE_URL);
+            web.loadUrl(START_URL);
         }
     }
 
-    private boolean isAllowedHost(String host) {
-        if (host == null) return false;
-        for (String h : ALLOWED_HOSTS) {
-            if (host.equals(h)) return true;
-        }
-        return false;
-    }
+    /** پل ارتباط جاوااسکریپت با اندروید */
+    class AndroidBridge {
 
-    /** صفحه خطای اتصال با دکمه تلاش مجدد */
-    private void showOfflinePage() {
-        String html = "<html dir='rtl'><body style='font-family:sans-serif;display:flex;"
-                + "flex-direction:column;align-items:center;justify-content:center;height:90vh;"
-                + "background:#f8fafc;color:#334155;text-align:center'>"
-                + "<div style='font-size:64px'>&#128268;</div>"
-                + "<h2 style='color:#2563eb'>اتصال برقرار نیست</h2>"
-                + "<p style='color:#64748b'>لطفاً اتصال اینترنت خود را بررسی کنید</p>"
-                + "<button onclick='location.href=\"" + BASE_URL + "\"' "
-                + "style='margin-top:16px;background:#2563eb;color:#fff;border:none;"
-                + "padding:12px 32px;border-radius:12px;font-size:16px'>تلاش مجدد</button>"
-                + "</body></html>";
-        web.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FILE_CHOOSER_CODE) {
-            Uri[] results = null;
-            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
-                results = new Uri[]{data.getData()};
-            }
-            if (filePathCallback != null) {
-                filePathCallback.onReceiveValue(results);
-                filePathCallback = null;
-            }
-            return;
+        /** کپی متن در کلیپ‌بورد گوشی */
+        @JavascriptInterface
+        public void copy(final String text) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    cm.setPrimaryClip(ClipData.newPlainText("modirman", text));
+                    Toast.makeText(MainActivity.this, "کپی شد ✓", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
-        super.onActivityResult(requestCode, resultCode, data);
+
+        /** اشتراک‌گذاری متن (برای فایل پشتیبان) */
+        @JavascriptInterface
+        public void shareText(final String title, final String text) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Intent send = new Intent(Intent.ACTION_SEND);
+                    send.setType("text/plain");
+                    send.putExtra(Intent.EXTRA_SUBJECT, title);
+                    send.putExtra(Intent.EXTRA_TEXT, text);
+                    startActivity(Intent.createChooser(send, "اشتراک‌گذاری پشتیبان"));
+                }
+            });
+        }
     }
 
     @Override
     public void onBackPressed() {
-        // صفحه خطا یا صفحه اصلی → خروج، بقیه → برگشت در وب‌ویو
-        if (web != null && web.canGoBack() && !loadError) {
+        if (web != null && web.canGoBack()) {
             web.goBack();
         } else {
             super.onBackPressed();

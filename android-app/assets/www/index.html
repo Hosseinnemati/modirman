@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#2563eb">
+<title>مدیرمن | مدیریت هوشمند ساختمان</title>
+<style>
+@font-face{font-family:Vazirmatn;src:url('fonts/Vazirmatn-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:Vazirmatn;src:url('fonts/Vazirmatn-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+:root{
+  --primary:#2563eb; --primary-dark:#1d4ed8; --primary-light:#dbeafe; --primary-soft:#eff6ff;
+  --bg:#f1f5f9; --card:#ffffff; --text:#0f172a; --text2:#64748b; --line:#e2e8f0;
+  --green:#059669; --green-soft:#d1fae5; --amber:#d97706; --amber-soft:#fef3c7;
+  --red:#dc2626; --red-soft:#fee2e2; --radius:18px; --shadow:0 2px 12px rgba(15,23,42,.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:Vazirmatn,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;overscroll-behavior:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;font-size:15px;width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;color:var(--text);outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+label{display:block;font-size:13px;font-weight:700;color:var(--text2);margin:12px 0 6px}
+.hidden{display:none!important}
+
+/* ===== Splash & Login ===== */
+#auth{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:24px;background:linear-gradient(180deg,#dbeafe 0%,#eff6ff 45%,var(--bg) 100%)}
+.auth-logo{text-align:center;margin-bottom:18px;animation:fadeUp .6s ease}
+.auth-logo img{width:92px;height:92px;border-radius:26px;box-shadow:0 8px 24px rgba(37,99,235,.25)}
+.auth-logo h1{font-size:30px;color:#1e3a8a;margin-top:10px}
+.auth-logo p{color:#64748b;font-size:14px;margin-top:4px}
+.auth-card{background:var(--card);border-radius:24px;padding:22px;box-shadow:var(--shadow);animation:fadeUp .6s ease .1s backwards}
+.auth-tabs{display:flex;background:#f1f5f9;border-radius:14px;padding:4px;margin-bottom:8px}
+.auth-tabs button{flex:1;padding:10px;border-radius:11px;font-weight:700;color:var(--text2);transition:.2s}
+.auth-tabs button.on{background:#fff;color:var(--primary);box-shadow:0 1px 6px rgba(0,0,0,.08)}
+.auth-btn{width:100%;background:linear-gradient(135deg,#3b82f6,var(--primary));color:#fff;font-weight:700;font-size:16px;padding:14px;border-radius:15px;margin-top:18px;box-shadow:0 4px 14px rgba(37,99,235,.35);transition:transform .15s}
+.auth-btn:active{transform:scale(.97)}
+.auth-note{font-size:12px;color:var(--text2);text-align:center;margin-top:14px;line-height:1.9}
+.input-wrap{position:relative}
+.input-wrap .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:17px;opacity:.5}
+
+/* ===== App Layout ===== */
+#app{min-height:100vh;display:flex;flex-direction:column}
+#header{position:sticky;top:0;z-index:40;background:linear-gradient(135deg,#3b82f6,var(--primary) 55%,#1e40af);color:#fff;padding:14px 16px calc(14px);border-radius:0 0 26px 26px;box-shadow:0 4px 16px rgba(37,99,235,.3)}
+#header .row{display:flex;align-items:center;gap:12px}
+#header h2{font-size:17px;font-weight:700;flex:1}
+#header .date{font-size:12px;opacity:.85;margin-top:3px}
+.hbtn{width:40px;height:40px;border-radius:13px;background:rgba(255,255,255,.16);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative;transition:.2s}
+.hbtn:active{background:rgba(255,255,255,.3)}
+.hbtn .badge{position:absolute;top:-4px;right:-4px;background:#fbbf24;color:#78350f;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+#view{flex:1;padding:16px 16px 96px;max-width:640px;margin:0 auto;width:100%}
+
+/* ===== Cards ===== */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px;animation:fadeUp .4s ease}
+.card-title{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);animation:fadeUp .4s ease}
+.stat .n{font-size:24px;font-weight:700;color:var(--primary)}
+.stat .l{font-size:12px;color:var(--text2);margin-top:2px}
+.stat .em{font-size:20px}
+.section-title{font-weight:700;font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.debt{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border-radius:22px;padding:20px;margin-bottom:12px;box-shadow:0 8px 20px rgba(37,99,235,.35);animation:fadeUp .4s ease}
+.debt .l{font-size:13px;opacity:.9}
+.debt .n{font-size:26px;font-weight:700;margin-top:6px}
+
+/* ===== List items ===== */
+.item{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:10px;animation:fadeUp .35s ease;border-right:4px solid transparent}
+.item.blue{border-right-color:var(--primary)} .item.green{border-right-color:var(--green)} .item.amber{border-right-color:var(--amber)} .item.red{border-right-color:var(--red)}
+.item .grow{flex:1;min-width:0}
+.item .t{font-weight:700;font-size:14.5px}
+.item .s{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.7}
+.avatar{width:44px;height:44px;border-radius:14px;background:var(--primary-soft);color:var(--primary);font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:8px;margin-right:4px}
+.b-blue{background:var(--primary-light);color:var(--primary-dark)} .b-green{background:var(--green-soft);color:#065f46} .b-amber{background:var(--amber-soft);color:#92400e} .b-red{background:var(--red-soft);color:#991b1b} .b-gray{background:#e2e8f0;color:#475569}
+.icon-btn{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:.2s}
+.icon-btn:active{transform:scale(.92)}
+.btn{background:var(--primary);color:#fff;font-weight:700;padding:11px 18px;border-radius:13px;font-size:14px;transition:transform .15s;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.btn:active{transform:scale(.96)}
+.btn.green{background:var(--green);box-shadow:0 2px 8px rgba(5,150,105,.3)}
+.btn.red{background:var(--red);box-shadow:0 2px 8px rgba(220,38,38,.3)}
+.btn.ghost{background:var(--primary-soft);color:var(--primary);box-shadow:none}
+.btn.gray{background:#f1f5f9;color:var(--text2);box-shadow:none}
+.btn.sm{padding:8px 14px;font-size:13px;border-radius:11px}
+.fab{position:fixed;bottom:88px;left:18px;z-index:35;background:linear-gradient(135deg,#3b82f6,var(--primary));color:#fff;font-size:15px;font-weight:700;padding:14px 20px;border-radius:18px;box-shadow:0 6px 18px rgba(37,99,235,.4);display:flex;align-items:center;gap:7px;transition:transform .15s}
+.fab:active{transform:scale(.94)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
+.chip{padding:8px 15px;border-radius:12px;background:var(--card);color:var(--text2);font-size:13px;font-weight:700;white-space:nowrap;box-shadow:var(--shadow);border:1.5px solid transparent}
+.chip.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.empty{text-align:center;color:var(--text2);padding:44px 20px;font-size:14px;line-height:2}
+.empty .em{font-size:44px;display:block;margin-bottom:8px}
+
+/* ===== Bottom Nav ===== */
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:#fff;display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(15,23,42,.08)}
+#nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#94a3b8;font-weight:700;padding:6px 2px;border-radius:12px;transition:.2s}
+#nav button .em{font-size:20px}
+#nav button.on{color:var(--primary);background:var(--primary-soft)}
+
+/* ===== Drawer ===== */
+#drawer-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:60;opacity:0;pointer-events:none;transition:.25s}
+#drawer{position:fixed;top:0;bottom:0;right:0;width:290px;max-width:84vw;background:#fff;z-index:61;transform:translateX(105%);transition:transform .28s cubic-bezier(.2,.8,.3,1);display:flex;flex-direction:column;border-radius:26px 0 0 26px}
+body.drawer-open #drawer-bg{opacity:1;pointer-events:auto}
+body.drawer-open #drawer{transform:none}
+#drawer .head{background:linear-gradient(135deg,#3b82f6,var(--primary));color:#fff;padding:22px 18px;border-radius:26px 0 0 0}
+#drawer .head .n{font-weight:700;font-size:17px}
+#drawer .head .p{font-size:12.5px;opacity:.9;margin-top:4px;direction:ltr;text-align:right}
+#drawer .list{flex:1;overflow-y:auto;padding:10px}
+.d-item{display:flex;align-items:center;gap:12px;width:100%;padding:13px 12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#334155;text-align:right}
+.d-item:active{background:var(--primary-soft)}
+.d-item .em{font-size:19px;width:26px;text-align:center}
+.d-item.danger{color:var(--red)}
+
+/* ===== Modal ===== */
+#modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:70;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.25s}
+#modal{background:#fff;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;border-radius:26px 26px 0 0;padding:20px;transform:translateY(40px);transition:.28s cubic-bezier(.2,.8,.3,1)}
+#modal-bg.show{opacity:1;pointer-events:auto}
+#modal-bg.show #modal{transform:none}
+#modal .m-title{font-weight:700;font-size:16px;margin-bottom:4px}
+#modal .m-sub{font-size:12.5px;color:var(--text2);margin-bottom:8px}
+#modal .m-actions{display:flex;gap:10px;margin-top:18px}
+#modal .m-actions .btn{flex:1;padding:13px;text-align:center}
+.m-handle{width:44px;height:5px;border-radius:3px;background:#e2e8f0;margin:0 auto 14px}
+.cardnum{direction:ltr;text-align:center;font-size:20px;font-weight:700;letter-spacing:4px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border-radius:16px;padding:16px;margin:10px 0}
+.imgprev{width:100%;max-height:220px;object-fit:contain;border-radius:14px;background:#f8fafc;margin-top:8px;border:1.5px dashed var(--line)}
+.receipt-thumb{width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;cursor:pointer;background:#f1f5f9}
+
+/* ===== Calendar ===== */
+.cal{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-head .m{font-weight:700;font-size:16px;color:var(--primary-dark)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-grid .wd{font-size:11px;color:var(--text2);font-weight:700;padding:6px 0}
+.cal-grid .wd.holiday{color:var(--red)}
+.cal-grid .d{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13.5px;border-radius:12px;color:#334155}
+.cal-grid .d.other{color:#cbd5e1}
+.cal-grid .d.today{background:var(--primary);color:#fff;font-weight:700;box-shadow:0 3px 8px rgba(37,99,235,.35)}
+.cal-grid .d.sel{outline:2px solid var(--primary);outline-offset:1px}
+.cal-grid .d .dot{position:absolute;bottom:5px;width:5px;height:5px;border-radius:50%;background:var(--amber)}
+.cal-grid .d .dot.personal{background:var(--primary)}
+.cal-legend{display:flex;gap:14px;justify-content:center;font-size:11.5px;color:var(--text2);margin-top:10px}
+.remind-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #fcd34d;border-radius:16px;padding:13px 15px;margin-bottom:12px;font-size:13.5px;line-height:1.9;animation:fadeUp .4s ease}
+.remind-banner b{color:#92400e}
+
+/* ===== Toast ===== */
+#toasts{position:fixed;top:14px;left:0;right:0;z-index:99;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 16px}
+.toast{background:#1e293b;color:#fff;font-size:13.5px;font-weight:700;padding:11px 20px;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.25);animation:toastIn .3s ease;max-width:100%}
+.toast.ok{background:var(--green)} .toast.err{background:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+.money{font-weight:700;color:var(--primary-dark)}
+.searchbox{position:relative;margin-bottom:12px}
+.searchbox input{padding-right:40px;background:#fff}
+.searchbox .em{position:absolute;right:13px;top:50%;transform:translateY(-50%);opacity:.45}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:12px;color:var(--text2);line-height:1.9;background:var(--primary-soft);border-radius:12px;padding:10px 13px;margin-top:10px}
+textarea{resize:vertical;min-height:74px}
+.back-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.back-row button{color:var(--primary);font-weight:700;font-size:14px;display:flex;align-items:center;gap:5px}
+</style>
+</head>
+<body>
+
+<div id="auth" class="hidden"></div>
+<div id="app" class="hidden">
+  <header id="header"></header>
+  <main id="view"></main>
+  <nav id="nav"></nav>
+</div>
+<div id="drawer-bg" onclick="toggleDrawer(false)"></div>
+<aside id="drawer"></aside>
+<div id="modal-bg"><div id="modal"></div></div>
+<div id="toasts"></div>
+
+<script>
+/* ============================================================
+   مدیرمن — نسخه آفلاین (دیتابیس محلی روی گوشی)
+   همه داده‌ها در localStorage خود دستگاه ذخیره می‌شود
+============================================================ */
+
+/* ---------- Jalali Date Engine (jalaali-js algorithm) ---------- */
+function dj(a,b){return ~~(a/b)}
+function mj(a,b){return a-~~(a/b)*b}
+var _breaks=[-61,9,38,199,426,686,756,818,1111,1181,1210,1635,2060,2097,2192,2262,2324,2394,2456,3178];
+function jalCal(jy){var bl=_breaks.length,gy=jy+621,leapJ=-14,jp=_breaks[0],jm,jump=0,leap,leapG,march,n,i;
+for(i=1;i<bl;i+=1){jm=_breaks[i];jump=jm-jp;if(jy<jm)break;leapJ=leapJ+dj(jump,33)*8+dj(mj(jump,33),4);jp=jm}
+n=jy-jp;leapJ=leapJ+dj(n,33)*8+dj(mj(n,33)+3,4);
+if(mj(jump,33)===4&&jump-n===4)leapJ+=1;
+leapG=dj(gy,4)-dj((dj(gy,100)+1)*3,4)-150;
+march=20+leapJ-leapG;
+if(jump-n<6)n=n-jump+dj(jump+4,33)*33;
+leap=mj(mj(n+1,33)-1,4);if(leap===-1)leap=4;
+return{leap:leap,gy:gy,march:march}}
+function g2d(gy,gm,gd){var d=dj((gy+dj(gm-8,6)+100100)*1461,4)+dj(153*mj(gm+9,12)+2,5)+gd-34840408;d=d-dj(dj(gy+100100+dj(gm-8,6),100)*3,4)+752;return d}
+function d2g(jdn){var j,i,gd,gm,gy;j=4*jdn+139361631;j=j+dj(dj(4*jdn+183187720,146097)*3,4)*4-3908;i=dj(mj(j,1461),4)*5+308;gd=dj(mj(i,153),5)+1;gm=mj(dj(i,153),12)+1;gy=dj(j,1461)-100100+dj(8-gm,6);return{gy:gy,gm:gm,gd:gd}}
+function j2d(jy,jm,jd){var r=jalCal(jy);return g2d(r.gy,3,r.march)+(jm-1)*31-dj(jm,7)*(jm-7)+jd-1}
+function d2j(jdn){var gy=d2g(jdn).gy,jy=gy-621,r=jalCal(jy),jdn1f=g2d(gy,3,r.march),jd,jm,k;k=jdn-jdn1f;
+if(k>=0){if(k<=185){jm=1+dj(k,31);jd=mj(k,31)+1;return{jy:jy,jm:jm,jd:jd}}else k-=186}
+else{jy-=1;k+=179;if(r.leap===1)k+=1}
+jm=7+dj(k,30);jd=mj(k,30)+1;return{jy:jy,jm:jm,jd:jd}}
+function isLeapJ(jy){return jalCal(jy).leap===0}
+function jMonthLen(jy,jm){if(jm<=6)return 31;if(jm<=11)return 30;return isLeapJ(jy)?30:29}
+function todayJ(){var d=new Date();return d2j(g2d(d.getFullYear(),d.getMonth()+1,d.getDate()))}
+function jStr(j){return j.jy+'-'+String(j.jm).padStart(2,'0')+'-'+String(j.jd).padStart(2,'0')}
+function jParse(s){var p=s.split('-');return{jy:+p[0],jm:+p[1],jd:+p[2]}}
+var J_MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+var J_WD=['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه'];
+
+/* ---------- Helpers ---------- */
+var FA_D='۰۱۲۳۴۵۶۷۸۹';
+function fa(n){return String(n).replace(/[0-9]/g,function(c){return FA_D[+c]})}
+function faMoney(n){return fa(String(n).replace(/\B(?=(\d{3})+(?!\d))/g,','))}
+function enDigits(s){return String(s).replace(/[۰-۹]/g,function(c){return FA_D.indexOf(c)}).replace(/[٠-٩]/g,function(c){return '٠١٢٣٤٥٦٧٨٩'.indexOf(c)})}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function fmtJalali(s){var j=jParse(s);return fa(j.jd)+' '+J_MONTHS[j.jm-1]+' '+fa(j.jy)}
+function normalizePhone(p){p=enDigits(p).replace(/[\s\-()]/g,'');if(p.indexOf('+98')===0)p='0'+p.slice(3);else if(p.indexOf('0098')===0)p='0'+p.slice(4);if(/^9\d{9}$/.test(p))p='0'+p;return /^09\d{9}$/.test(p)?p:null}
+
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast('حافظه اپ پر شده است — چند تصویر رسید قدیمی را حذف کنید','err');return false}}
+function getB(){return store('mm_building')||null}
+function getAccs(){return store('mm_accounts')||[]}
+function getBills(){return store('mm_bills')||[]}
+function getReceipts(){return store('mm_receipts')||[]}
+function getAnns(){return store('mm_anns')||[]}
+function getReqs(){return store('mm_requests')||[]}
+function getRems(){return store('mm_reminders')||[]}
+function save(k,arr){return store(k,arr)}
+function me(){var s=store('mm_session');if(!s)return null;return getAccs().find(function(a){return a.phone===s})||null}
+function isMgr(){var u=me();return u&&u.role==='manager'}
+
+/* ---------- Toast ---------- */
+var _lastToast=0;
+function toast(msg,type){var now=Date.now();if(now-_lastToast<250)return;_lastToast=now;
+var t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;
+document.getElementById('toasts').appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transition='.3s';setTimeout(function(){t.remove()},320)},2600)}
+
+/* ---------- Modal ---------- */
+function modal(html,onOpen){var m=document.getElementById('modal');m.innerHTML='<div class="m-handle"></div>'+html;document.getElementById('modal-bg').classList.add('show');if(onOpen)onOpen()}
+function closeModal(){document.getElementById('modal-bg').classList.remove('show')}
+document.getElementById('modal-bg').addEventListener('click',function(e){if(e.target.id==='modal-bg')closeModal()});
+function confirmDlg(title,msg,okLabel,cb,danger){
+modal('<div class="m-title">'+esc(title)+'</div><p style="font-size:14px;color:var(--text2);line-height:2;margin-top:6px">'+esc(msg)+'</p>'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn '+(danger?'red':'')+'" id="cf-ok">'+esc(okLabel)+'</button></div>');
+document.getElementById('cf-ok').onclick=function(){closeModal();cb()}}
+
+/* ---------- Image compress ---------- */
+function compressImage(file,maxDim,q){return new Promise(function(res,rej){
+if(!file||String(file.type).indexOf('image')!==0){rej('فقط فایل تصویری انتخاب کنید');return}
+if(file.size>10*1024*1024){rej('حجم تصویر بیشتر از ۱۰ مگابایت است');return}
+var fr=new FileReader();fr.onerror=function(){rej('خواندن فایل ناموفق بود')};
+fr.onload=function(){var img=new Image();img.onerror=function(){rej('تصویر قابل خواندن نیست')};
+img.onload=function(){var w=img.width,h=img.height,r=Math.min(1,maxDim/Math.max(w,h));
+var c=document.createElement('canvas');c.width=Math.round(w*r);c.height=Math.round(h*r);
+c.getContext('2d').drawImage(img,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',q))};
+img.src=fr.result};fr.readAsDataURL(file)})}
+
+/* ============================================================
+   AUTH: Onboarding / Login
+============================================================ */
+var authTab='login';
+function renderAuth(){
+var el=document.getElementById('auth');el.classList.remove('hidden');document.getElementById('app').classList.add('hidden');
+if(!store('mm_setup')){
+el.innerHTML=authLogo()+
+'<div class="auth-card">'+
+'<div class="m-title" style="text-align:center">راه‌اندازی ساختمان</div>'+
+'<p class="m-sub" style="text-align:center">فقط یک بار — اطلاعات ساختمان و حساب مدیر را وارد کنید</p>'+
+'<label>نام ساختمان</label><input id="ob-name" placeholder="مثلاً: برج نگین">'+
+'<div class="row2"><div><label>تعداد واحد</label><input id="ob-units" type="tel" inputmode="numeric" placeholder="۸"></div>'+
+'<div><label>آدرس (اختیاری)</label><input id="ob-addr" placeholder="تهران، خیابان..."></div></div>'+
+'<label>نام و نام خانوادگی مدیر</label><input id="ob-mname" placeholder="مثلاً: حسین نعمتی">'+
+'<div class="row2"><div><label>شماره موبایل</label><input id="ob-phone" type="tel" inputmode="numeric" dir="ltr" style="text-align:right" placeholder="09121234567"></div>'+
+'<div><label>رمز عبور</label><input id="ob-pass" type="password" placeholder="حداقل ۶ کاراکتر"></div></div>'+
+'<div style="display:flex;align-items:center;gap:8px;margin-top:14px"><input type="checkbox" id="ob-demo" style="width:18px;height:18px;accent-color:var(--primary)"><label for="ob-demo" style="margin:0;font-weight:400">افزودن داده نمونه برای آزمایش (۴ ساکن، قبض‌ها، اعلان‌ها...)</label></div>'+
+'<button class="auth-btn" onclick="doOnboard()">🚀 شروع می‌کنیم</button>'+
+'<div class="auth-note">💾 داده‌ها فقط روی همین گوشی ذخیره می‌شود — بدون نیاز به اینترنت<br>از بخش پشتیبان‌گیری می‌توانید از اطلاعات کپی امن بگیرید</div></div>';
+return}
+var tabs='<div class="auth-tabs"><button class="'+(authTab==='login'?'on':'')+'" onclick="authTab=\'login\';renderAuth()">ورود</button><button class="'+(authTab==='register'?'on':'')+'" onclick="authTab=\'register\';renderAuth()">ثبت‌نام</button></div>';
+if(authTab==='login'){
+el.innerHTML=authLogo()+'<div class="auth-card">'+tabs+
+'<label>شماره موبایل</label><div class="input-wrap"><input id="lg-phone" type="tel" inputmode="numeric" dir="ltr" style="text-align:right" placeholder="09121234567"><span class="ic">📞</span></div>'+
+'<label>رمز عبور</label><div class="input-wrap"><input id="lg-pass" type="password" placeholder="رمز عبور خود را وارد کنید"><span class="ic">🔒</span></div>'+
+'<button class="auth-btn" onclick="doLogin()">ورود به حساب</button>'+
+'<div class="auth-note">حساب خود را فراموش کردید؟ مدیر ساختمان می‌تواند از بخش ساکنین رمز شما را بازنشانی کند</div></div>';
+}else{
+el.innerHTML=authLogo()+'<div class="auth-card">'+tabs+
+'<label>نام و نام خانوادگی</label><input id="rg-name" placeholder="مثلاً: سارا محمدی">'+
+'<label>شماره موبایل</label><div class="input-wrap"><input id="rg-phone" type="tel" inputmode="numeric" dir="ltr" style="text-align:right" placeholder="09121234567"><span class="ic">📞</span></div>'+
+'<div class="row2"><div><label>شماره واحد</label><input id="rg-unit" type="tel" inputmode="numeric" placeholder="۸"></div>'+
+'<div><label>طبقه (اختیاری)</label><input id="rg-floor" type="tel" inputmode="numeric" placeholder="۲"></div></div>'+
+'<label>رمز عبور</label><div class="input-wrap"><input id="rg-pass" type="password" placeholder="حداقل ۶ کاراکتر"><span class="ic">🔒</span></div>'+
+'<button class="auth-btn" onclick="doRegister()">ساخت حساب کاربری</button>'+
+'<div class="auth-note">بعد از ثبت‌نام، مدیر ساختمان عضویت شما را تأیید می‌کند</div></div>';
+}}
+function authLogo(){return '<div class="auth-logo"><img src="logo.png" alt="لوگوی مدیرمن"><h1>مدیرمن</h1><p>مدیریت هوشمند ساختمان</p></div>'}
+
+function doOnboard(){
+var name=document.getElementById('ob-name').value.trim(),
+units=+enDigits(document.getElementById('ob-units').value)||0,
+addr=document.getElementById('ob-addr').value.trim(),
+mname=document.getElementById('ob-mname').value.trim(),
+phone=normalizePhone(document.getElementById('ob-phone').value),
+pass=document.getElementById('ob-pass').value;
+if(name.length<2){toast('نام ساختمان را وارد کنید','err');return}
+if(units<1||units>500){toast('تعداد واحد معتبر نیست','err');return}
+if(mname.length<2){toast('نام مدیر را وارد کنید','err');return}
+if(!phone){toast('شماره موبایل معتبر نیست','err');return}
+if(pass.length<6){toast('رمز عبور باید حداقل ۶ کاراکتر باشد','err');return}
+var accs=getAccs();
+if(accs.some(function(a){return a.phone===phone})){toast('این شماره قبلاً ثبت شده است','err');return}
+store('mm_building',{name:name,address:addr,units:units,cardNumber:'',cardHolder:'',sheba:'',createdAt:new Date().toISOString()});
+accs.push({id:uid(),name:mname,phone:phone,pass:pass,role:'manager',unitNumber:null,floor:null,status:'active',createdAt:new Date().toISOString()});
+save('mm_accounts',accs);
+if(document.getElementById('ob-demo').checked)seedDemo(phone);
+store('mm_setup','1');store('mm_session',phone);
+toast('ساختمان «'+name+'» راه‌اندازی شد 🎉','ok');enterApp()}
+
+function doLogin(){
+var phone=normalizePhone(document.getElementById('lg-phone').value),pass=document.getElementById('lg-pass').value;
+if(!phone||!pass){toast('شماره موبایل و رمز را وارد کنید','err');return}
+var a=getAccs().find(function(x){return x.phone===phone});
+if(!a||a.pass!==pass){toast('شماره موبایل یا رمز عبور اشتباه است','err');return}
+if(a.status==='inactive'){toast('حساب شما غیرفعال شده است؛ با مدیر تماس بگیرید','err');return}
+store('mm_session',phone);enterApp()}
+
+function doRegister(){
+var name=document.getElementById('rg-name').value.trim(),phone=normalizePhone(document.getElementById('rg-phone').value),
+unit=+enDigits(document.getElementById('rg-unit').value)||null,floor=+enDigits(document.getElementById('rg-floor').value)||null,
+pass=document.getElementById('rg-pass').value;
+if(name.length<2){toast('نام را وارد کنید','err');return}
+if(!phone){toast('شماره موبایل معتبر نیست','err');return}
+if(pass.length<6){toast('رمز عبور باید حداقل ۶ کاراکتر باشد','err');return}
+var accs=getAccs();
+if(accs.some(function(a){return a.phone===phone})){toast('این شماره قبلاً ثبت‌نام کرده است','err');return}
+accs.push({id:uid(),name:name,phone:phone,pass:pass,role:'resident',unitNumber:unit,floor:floor,status:'unassigned',createdAt:new Date().toISOString()});
+save('mm_accounts',accs);
+toast('ثبت‌نام شد! در انتظار تأیید مدیر','ok');authTab='login';renderAuth()}
+
+function logout(){store('mm_session',null);closeDrawer();renderAuth()}
+
+/* ============================================================
+   DEMO SEED
+============================================================ */
+function seedDemo(mgrPhone){
+var B=getB(),t=todayJ(),accs=getAccs();
+var names=[['سارا محمدی',8,2],['علی رضایی',3,1],['زهرا موسوی',12,4],['رضا قاسمی',5,3]];
+names.forEach(function(n){accs.push({id:uid(),name:n[0],phone:'0912'+String(1000000+n[1]*7+n[2]).slice(-8),pass:'1234',role:'resident',unitNumber:n[1],floor:n[2],status:'active',createdAt:new Date().toISOString()})});
+save('mm_accounts',accs);
+var bills=[['شارژ ماه '+J_MONTHS[(t.jm-1)%12],850000,null],['شارژ ماه قبل',850000,8],['تعویض لامپ راهرو',120000,3],['شارژ موتورخانه',400000,12],['خدمات نظافت سالانه',600000,5]];
+var arr=[];bills.forEach(function(b,i){var unit=b[2]||(1+(i%+B.units));
+arr.push({id:uid(),title:b[0],amount:b[1],unitNumber:unit,dueDate:jStr(t),status:i===1?'paid':'pending',createdAt:new Date().toISOString(),paidAt:i===1?new Date().toISOString():null})});
+save('mm_bills',arr);
+save('mm_anns',[
+{id:uid(),title:'جلسه ماهانه اولیای ساختمان',content:'جلسه ماهانه اولیای ساختمان روز پنجشنبه ساعت ۱۸ در لابی برگزار می‌شود. حضور همه همسایه‌ها گرامی است.',type:'جلسه',createdAt:new Date().toISOString()},
+{id:uid(),title:'قطع موقت آب',content:'به دلیل تعمیرات لوله اصلی، آب ساختمان روز سه‌شنبه از ساعت ۹ تا ۱۲ قطع می‌شود.',type:'هشدار',createdAt:new Date().toISOString()}]);
+save('mm_requests',[
+{id:uid(),title:'خرابی دریب برق راهرو',description:'دریب راهرو طبقه دوم خراب است و نور روشن نمی‌شود.',unitNumber:3,category:'برقی',priority:'high',status:'open',createdAt:new Date().toISOString()},
+{id:uid(),title:'روغن‌کاری درب ورودی',description:'درب ورودی صدای زیادی می‌دهد.',unitNumber:8,category:'سایر',priority:'medium',status:'done',createdAt:new Date().toISOString()}]);
+save('mm_reminders',[
+{id:uid(),creator:mgrPhone,title:'جلسه ماهانه اولیای ساختمان',description:'ساعت ۱۸ — لابی ساختمان',date:jStr(t),time:'18:00',type:'building',createdAt:new Date().toISOString()},
+{id:uid(),creator:mgrPhone,title:'پرداخت شارژ ماه',description:'واریز به حساب ساختمان',date:jStr({jy:t.jy,jm:t.jm,jd:Math.min(t.jd+2,jMonthLen(t.jy,t.jm))}),time:'10:00',type:'building',createdAt:new Date().toISOString()}]);
+store('mm_building',Object.assign(B,{cardNumber:'6037997512345678',cardHolder:'هیئت مدیره '+B.name,sheba:'IR820120010000008589878001'}))}
+
+/* ============================================================
+   APP SHELL
+============================================================ */
+var tab='dash';
+var NAV=[['dash','🏠','داشبورد'],['bills','🧾','قبض‌ها'],['calendar','🗓','تقویم'],['anns','📢','اعلان‌ها'],['residents','👥','ساکنین']];
+function enterApp(){document.getElementById('auth').classList.add('hidden');document.getElementById('app').classList.remove('hidden');render()}
+function setTab(t){tab=t;closeDrawer();render();window.scrollTo(0,0)}
+function closeDrawer(){document.body.classList.remove('drawer-open')}
+function render(){renderHeader();renderNav();renderView();renderDrawer()}
+function renderHeader(){var u=me(),B=getB();if(!u)return;
+var t=todayJ();
+document.getElementById('header').innerHTML=
+'<div class="row"><button class="hbtn" onclick="toggleDrawer(true)">☰</button>'+
+'<div style="flex:1"><h2>'+esc(u.role==='manager'?'مدیر '+esc(B.name):esc(u.name))+'</h2>'+
+'<div class="date">'+esc(B.name)+' • '+J_WD[(j2d(t.jy,t.jm,t.jd)+3)%7]+' '+fa(t.jd)+' '+J_MONTHS[t.jm-1]+' '+fa(t.jy)+'</div></div>'+
+'<button class="hbtn" onclick="setTab(\'anns\')">🔔'+(getAnns().length?'<span class="badge">'+fa(getAnns().length)+'</span>':'')+'</button></div>'}
+function renderNav(){document.getElementById('nav').innerHTML=NAV.map(function(n){
+return '<button class="'+(tab===n[0]?'on':'')+'" onclick="setTab(\''+n[0]+'\')"><span class="em">'+n[1]+'</span>'+n[2]+'</button>'}).join('')}
+function toggleDrawer(open){document.body.classList.toggle('drawer-open',open===undefined?!document.body.classList.contains('drawer-open'):open)}
+function renderDrawer(){var u=me(),B=getB();if(!u)return;
+document.getElementById('drawer').innerHTML=
+'<div class="head"><div class="n">'+esc(u.name)+'</div><div class="p">'+fa(u.phone)+'</div>'+
+'<div style="margin-top:8px"><span class="badge '+(u.role==='manager'?'b-green':'b-blue')+'">'+(u.role==='manager'?'👑 مدیر ساختمان':'ساکن')+'</span>'+
+(u.unitNumber?'<span class="badge b-blue">واحد '+fa(u.unitNumber)+'</span>':'')+'</div></div>'+
+'<div class="list">'+
+'<button class="d-item" onclick="toggleDrawer(false);openProfile()"><span class="em">👤</span>پروفایل من</button>'+
+(isMgr()?'<button class="d-item" onclick="toggleDrawer(false);openSettings()"><span class="em">⚙️</span>تنظیمات ساختمان و پرداخت</button>':'')+
+'<button class="d-item" onclick="toggleDrawer(false);openBackup()"><span class="em">💾</span>پشتیبان‌گیری و بازیابی</button>'+
+'<button class="d-item" onclick="toggleDrawer(false);viewRequests()"><span class="em">🔧</span>درخواست‌های تعمیرات</button>'+
+'<button class="d-item" onclick="toggleDrawer(false);aboutDlg()"><span class="em">ℹ️</span>درباره مدیرمن</button>'+
+'<button class="d-item danger" onclick="logout()"><span class="em">🚪</span>خروج از حساب</button>'+
+'<div class="hint">💾 داده‌های شما فقط روی همین گوشی ذخیره می‌شود. دوره‌ای پشتیبان بگیرید!</div></div>'}
+function aboutDlg(){modal('<div class="m-title">درباره مدیرمن</div>'+
+'<div style="text-align:center;padding:14px"><img src="logo.png" style="width:74px;height:74px;border-radius:20px"><div style="font-weight:700;font-size:18px;margin-top:10px">مدیرمن</div><div style="color:var(--text2);font-size:13px;margin-top:4px">نسخه ۱.۱ — نسخه آفلاین</div>'+
+'<div class="hint" style="margin-top:16px">مدیریت ساختمان بدون نیاز به اینترنت:<br>🧾 قبض‌ها و رسید پرداخت • 🗓 تقویم و یادآوری<br>👥 ساکنین و سطح دسترسی • 📢 اعلان‌ها<br>💾 پشتیبان‌گیری و بازیابی اطلاعات</div>'+
+'<div class="m-actions"><button class="btn ghost" onclick="closeModal()">بستن</button></div></div>')}
+
+/* ============================================================
+   VIEWS
+============================================================ */
+function renderView(){var el=document.getElementById('view');
+if(tab==='dash')el.innerHTML=vDash();
+else if(tab==='bills')el.innerHTML=vBills();
+else if(tab==='calendar')el.innerHTML=vCalendar();
+else if(tab==='anns')el.innerHTML=vAnns();
+else if(tab==='residents')el.innerHTML=vResidents();
+else if(tab==='requests')el.innerHTML=vRequests();
+bindView()}
+function bindView(){/* رویدادها inline متصل شده‌اند */}
+function viewRequests(){tab='requests';window.scrollTo(0,0);renderView()}
+
+/* ---------- Dashboard ---------- */
+function vDash(){var u=me(),B=getB(),t=todayJ();
+var bills=getBills(),rems=getRems(),anns=getAnns(),reqs=getReqs(),rcs=getReceipts();
+var todayRems=rems.filter(function(r){return r.date===jStr(t)&&(r.type==='building'||r.creator===u.phone)});
+var out='';
+todayRems.forEach(function(r){out+='<div class="remind-banner" onclick="setTab(\'calendar\')">⏰ <b>یادآوری امروز:</b> '+esc(r.title)+(r.time?' — ساعت '+fa(r.time):'')+'</div>'});
+if(u.role==='manager'){
+var active=getAccs().filter(function(a){return a.status==='active'&&a.role==='resident'}).length;
+var pend=bills.filter(function(b){return b.status==='pending'}).length;
+var openReq=reqs.filter(function(r){return r.status!=='done'}).length;
+var pendRc=rcs.filter(function(r){return r.status==='pending'}).length;
+out+='<div class="stat-grid">'+
+'<div class="stat"><div class="em">👥</div><div class="n">'+fa(active)+'</div><div class="l">ساکنین فعال</div></div>'+
+'<div class="stat"><div class="em">🧾</div><div class="n">'+fa(pend)+'</div><div class="l">قبض معوق</div></div>'+
+'<div class="stat"><div class="em">🔧</div><div class="n">'+fa(openReq)+'</div><div class="l">درخواست باز</div></div>'+
+'<div class="stat"><div class="em">⏰</div><div class="n">'+fa(todayRems.length)+'</div><div class="l">یادآور امروز</div></div></div>';
+if(pendRc)out+='<div class="item amber" onclick="tab=\'bills\';billsSub=\'receipts\';renderView()" style="cursor:pointer"><span style="font-size:22px">📸</span><div class="grow"><div class="t">رسیدهای در انتظار تأیید</div><div class="s">'+fa(pendRc)+' رسید منتظر بررسی شماست — برای بررسی بزنید</div></div><span style="color:var(--text2)">‹</span></div>';
+out+='<div class="section-title">⚡ دسترسی سریع</div><div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+'<button class="btn ghost" onclick="openNewBill()">🧾 ثبت قبض جدید</button>'+
+'<button class="btn ghost" onclick="openNewAnn()">📢 انتشار اعلان</button>'+
+'<button class="btn ghost" onclick="openAddResident()">👥 افزودن ساکن</button>'+
+'<button class="btn ghost" onclick="viewRequests()">🔧 درخواست‌های تعمیرات</button></div>';
+var lastA=anns[0];
+if(lastA)out+='<div class="section-title">📢 آخرین اعلان</div><div class="card"><div class="card-title">'+esc(lastA.title)+'</div><p style="font-size:13px;color:var(--text2);line-height:2;margin-top:6px">'+esc(lastA.content).slice(0,120)+'...</p></div>';
+}else{
+var my=bills.filter(function(b){return b.unitNumber===u.unitNumber});
+var debt=my.filter(function(b){return b.status==='pending'}).reduce(function(s,b){return s+b.amount},0);
+out+='<div class="debt"><div class="l">بدهی واحد '+fa(u.unitNumber||'—')+'</div><div class="n">'+faMoney(debt)+' تومان</div></div>';
+if(B.cardNumber)out+='<div class="card"><div class="card-title">💳 شماره کارت شارژ ساختمان</div>'+
+'<div class="cardnum">'+esc(groupCard(B.cardNumber))+'</div>'+
+'<button class="btn sm" onclick="copyText(\''+esc(B.cardNumber)+'\',\'شماره کارت کپی شد\')">📋 کپی شماره کارت</button></div>';
+var myRems=rems.filter(function(r){return r.date===jStr(t)&&(r.type==='building'||r.creator===u.phone)});
+if(myRems.length)out+='<div class="section-title">⏰ یادآوری‌های امروز</div>'+myRems.map(function(r){return '<div class="item blue"><span style="font-size:20px">⏰</span><div class="grow"><div class="t">'+esc(r.title)+'</div><div class="s">'+(r.time?'ساعت '+fa(r.time)+' • ':'')+esc(r.description||'')+'</div></div></div>'}).join('');
+}
+var openReq=reqs.filter(function(r){return r.status!=='done'&&u.role==='manager'?true:(r.unitNumber===u.unitNumber&&r.status!=='done')}).slice(0,2);
+if(openReq.length)out+='<div class="section-title">🔧 درخواست‌های اخیر</div>'+openReq.map(function(r){return '<div class="item '+(r.priority==='high'?'red':r.status==='done'?'green':'blue')+'"><span style="font-size:20px">🔧</span><div class="grow"><div class="t">'+esc(r.title)+'</div><div class="s">واحد '+fa(r.unitNumber||'—')+' • '+reqStatusFa(r.status)+'</div></div></div>'}).join('');
+return out}
+
+/* ---------- Bills ---------- */
+var billsSub='bills';
+function vBills(){var u=me(),B=getB(),bills=getBills().slice().sort(function(a,b){return b.createdAt.localeCompare(a.createdAt)});
+var out='';
+if(isMgr()){
+out+='<div class="chips">'+[['bills','قبض‌ها'],['paid','پرداخت‌شده'],['receipts','رسیدها'+(getReceipts().filter(function(r){return r.status==='pending'}).length?' ('+fa(getReceipts().filter(function(r){return r.status==='pending'}).length)+')':'')]].map(function(s){
+return '<button class="chip '+(billsSub===s[0]?'on':'')+'" onclick="billsSub=\''+s[0]+'\';renderView()">'+s[1]+'</button>'}).join('')+'</div>';
+if(billsSub==='receipts'){return out+vReceipts()}
+var list=bills.filter(function(b){return billsSub==='paid'?b.status==='paid':b.status==='pending'});
+out+=list.length?list.map(billCardMgr).join(''):'<div class="empty"><span class="em">🧾</span>قبضی در این بخش نیست<br><button class="btn sm" style="margin-top:10px" onclick="openNewBill()">+ ثبت اولین قبض</button></div>';
+return out}
+/* resident */
+var list=bills.filter(function(b){return b.unitNumber===u.unitNumber});
+var myRcs=getReceipts().filter(function(r){return r.by===u.phone});
+out+='<div class="chips">'+[['bills','پرداخت نشده'],['paid','پرداخت شده'],['receipts','رسیدهای من']].map(function(s){return '<button class="chip '+(billsSub===s[0]?'on':'')+'" onclick="billsSub=\''+s[0]+'\';renderView()">'+s[1]+'</button>'}).join('')+'</div>';
+if(billsSub==='receipts')return out+(myRcs.length?myRcs.map(rcCardRes).join(''):'<div class="empty"><span class="em">📸</span>هنوز رسیدی نفرستاده‌اید</div>');
+var filtered=list.filter(function(b){return billsSub==='paid'?b.status==='paid':b.status==='pending'});
+if(!filtered.length)return out+'<div class="empty"><span class="em">🧾</span>قبضی در این بخش نیست</div>';
+return out+filtered.map(function(b){
+var rc=myRcs.find(function(r){return r.billId===b.id&&r.status==='pending'});
+return '<div class="item '+(b.status==='paid'?'green':rc?'amber':'blue')+'"><div class="grow"><div class="t">'+esc(b.title)+'</div>'+
+'<div class="s">مبلغ: <span class="money">'+faMoney(b.amount)+' تومان</span> • مهلت: '+fmtJalali(b.dueDate)+'</div>'+
+(rc?'<div style="margin-top:6px"><span class="badge b-amber">📸 رسید در انتظار تأیید</span></div>':'')+
+(b.status==='paid'?'<div style="margin-top:6px"><span class="badge b-green">✅ پرداخت شده</span></div>':'')+'</div>'+
+(b.status==='pending'&&!rc?'<button class="btn sm" onclick="openPay(\''+b.id+'\')">پرداخت</button>':'')+'</div>'}).join('')}
+
+function billCardMgr(b){
+var accs=getAccs(),res=accs.find(function(a){return a.role==='resident'&&a.unitNumber===b.unitNumber});
+return '<div class="item '+(b.status==='paid'?'green':'blue')+'"><div class="grow"><div class="t">'+esc(b.title)+'</div>'+
+'<div class="s">واحد '+fa(b.unitNumber)+(res?' — '+esc(res.name):'')+' • <span class="money">'+faMoney(b.amount)+' تومان</span><br>مهلت: '+fmtJalali(b.dueDate)+'</div></div>'+
+(b.status==='pending'?'<button class="btn sm green" onclick="markPaid(\''+b.id+'\')">پرداخت حضوری</button>':'<span class="badge b-green">پرداخت شده</span>')+
+'<button class="icon-btn" style="color:var(--red)" onclick="delBill(\''+b.id+'\')">🗑</button></div>'}
+function markPaid(id){var bills=getBills();var b=bills.find(function(x){return x.id===id});if(!b)return;
+b.status='paid';b.paidAt=new Date().toISOString();save('mm_bills',bills);toast('قبض پرداخت‌شده علامت خورد','ok');renderView()}
+function delBill(id){confirmDlg('حذف قبض','این قبض و رسیدهای آن حذف می‌شود. مطمئنید؟','حذف',function(){
+save('mm_bills',getBills().filter(function(b){return b.id!==id}));
+save('mm_receipts',getReceipts().filter(function(r){return r.billId!==id}));
+toast('قبض حذف شد','ok');renderView()},true)}
+
+function openNewBill(){var B=getB(),t=todayJ();
+var units='';for(var i=1;i<=+B.units;i++)units+='<option value="'+i+'">واحد '+fa(i)+'</option>';
+var days='';for(var i=1;i<=31;i++)days+='<option '+(i===t.jd?'selected':'')+' value="'+i+'">'+fa(i)+'</option>';
+var months=J_MONTHS.map(function(m,i){return '<option '+(i+1===t.jm?'selected':'')+' value="'+(i+1)+'">'+m+'</option>'}).join('');
+var years='';for(var y=t.jy-2;y<=t.jy+3;y++)years+='<option '+(y===t.jy?'selected':'')+' value="'+y+'">'+fa(y)+'</option>';
+modal('<div class="m-title">🧾 ثبت قبض جدید</div>'+
+'<label>عنوان قبض</label><input id="nb-title" placeholder="مثلاً: شارژ ماه آبان">'+
+'<label>مبلغ (تومان)</label><input id="nb-amount" type="tel" inputmode="numeric" placeholder="۸۵۰,۰۰۰" oninput="fmtAmount(this)">'+
+'<label>واحد</label><select id="nb-unit">'+units+'</select>'+
+'<label>تاریخ مهلت پرداخت</label><div class="row2" style="grid-template-columns:1fr 1fr 1fr"><select id="nb-d">'+days+'</select><select id="nb-m">'+months+'</select><select id="nb-y">'+years+'</select></div>'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveNewBill()">ثبت قبض</button></div>')}
+function fmtAmount(el){var v=enDigits(el.value).replace(/\D/g,'');el.value=v?v.replace(/\B(?=(\d{3})+(?!\d))/g,','):''}
+function saveNewBill(){
+var title=document.getElementById('nb-title').value.trim(),
+amount=+enDigits(document.getElementById('nb-amount').value.replace(/\D/g,'')),
+unit=+document.getElementById('nb-unit').value,
+d=+document.getElementById('nb-d').value,m=+document.getElementById('nb-m').value,y=+document.getElementById('nb-y').value;
+if(title.length<2){toast('عنوان قبض را وارد کنید','err');return}
+if(amount<1000){toast('مبلغ معتبر نیست','err');return}
+var bills=getBills();bills.push({id:uid(),title:title,amount:amount,unitNumber:unit,dueDate:jStr({jy:y,jm:m,jd:Math.min(d,jMonthLen(y,m))}),status:'pending',createdAt:new Date().toISOString(),paidAt:null});
+save('mm_bills',bills);closeModal();toast('قبض ثبت شد','ok');renderView()}
+
+/* ---------- Pay & Receipts ---------- */
+var payImage=null;
+function openPay(billId){var B=getB(),u=me(),bills=getBills(),b=bills.find(function(x){return x.id===billId});if(!b)return;
+payImage=null;
+modal('<div class="m-title">💳 پرداخت قبض</div><div class="m-sub">'+esc(b.title)+' — واحد '+fa(b.unitNumber)+'</div>'+
+'<div style="text-align:center;font-size:24px;font-weight:700;color:var(--primary-dark);margin:8px 0">'+faMoney(b.amount)+' <span style="font-size:14px">تومان</span></div>'+
+(B.cardNumber?'<div class="cardnum">'+esc(groupCard(B.cardNumber))+'</div>'+
+'<div style="display:flex;gap:8px"><button class="btn sm" style="flex:1" onclick="copyText(\''+esc(B.cardNumber)+'\',\'شماره کارت کپی شد\')">📋 کپی کارت</button>'+
+(B.sheba?'<button class="btn sm gray" style="flex:1" onclick="copyText(\''+esc(B.sheba)+'\',\'شماره شبا کپی شد\')">🏦 کپی شبا</button>':'')+'</div>':
+'<div class="hint">⚠️ مدیر هنوز شماره کارت ثبت نکرده است — از مدیر بپرسید</div>')+
+'<label>تصویر رسید واریز</label><input type="file" id="pay-file" accept="image/*" onchange="pickReceipt(this)">'+
+'<img id="pay-prev" class="imgprev hidden">'+
+'<label>یادداشت (اختیاری)</label><input id="pay-note" placeholder="مثلاً: واریز از بانک ملی">'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn green" onclick="submitReceipt(\''+b.id+'\')">ارسال برای تأیید مدیر</button></div>')}
+function pickReceipt(input){var f=input.files&&input.files[0];if(!f)return;
+compressImage(f,1024,0.7).then(function(d){payImage=d;var p=document.getElementById('pay-prev');p.src=d;p.classList.remove('hidden')}).catch(function(e){toast(e,'err')})}
+function submitReceipt(billId){
+if(!payImage){toast('ابتدا تصویر رسید را انتخاب کنید','err');return}
+var u=me(),bills=getBills(),b=bills.find(function(x){return x.id===billId});
+var rcs=getReceipts();
+rcs.push({id:uid(),billId:billId,by:u.phone,byName:u.name,amount:b.amount,image:payImage,note:document.getElementById('pay-note').value.trim(),status:'pending',createdAt:new Date().toISOString()});
+if(save('mm_receipts',rcs)){closeModal();toast('رسید ارسال شد — در انتظار تأیید مدیر','ok');renderView()}}
+function rcCardRes(r){var bills=getBills(),b=bills.find(function(x){return x.id===r.billId});
+var bd=r.status==='pending'?'<span class="badge b-amber">در انتظار تأیید</span>':r.status==='approved'?'<span class="badge b-green">تأیید شد</span>':'<span class="badge b-red">رد شد</span>';
+return '<div class="item '+(r.status==='approved'?'green':r.status==='rejected'?'red':'amber')+'">'+
+'<img class="receipt-thumb" src="'+r.image+'" onclick="viewImage(\''+r.id+'\')"><div class="grow"><div class="t">'+esc(b?b.title:'قبض حذف‌شده')+'</div>'+
+'<div class="s">'+faMoney(r.amount)+' تومان'+(r.note?' • '+esc(r.note):'')+'</div><div style="margin-top:5px">'+bd+'</div></div>'+
+'<button class="icon-btn" style="color:var(--red)" onclick="delReceipt(\''+r.id+'\')">🗑</button></div>'}
+function vReceipts(){var rcs=getReceipts().slice().sort(function(a,b){return b.createdAt.localeCompare(a.createdAt)}),bills=getBills(),accs=getAccs();
+if(!rcs.length)return '<div class="empty"><span class="em">📸</span>رسیدی ثبت نشده است</div>';
+return rcs.map(function(r){var b=bills.find(function(x){return x.id===r.billId}),u=accs.find(function(a){return a.phone===r.by});
+var bd=r.status==='pending'?'<span class="badge b-amber">در انتظار</span>':r.status==='approved'?'<span class="badge b-green">تأیید</span>':'<span class="badge b-red">رد</span>';
+return '<div class="item '+(r.status==='approved'?'green':r.status==='rejected'?'red':'amber')+'">'+
+'<img class="receipt-thumb" src="'+r.image+'" onclick="viewImage(\''+r.id+'\')">'+
+'<div class="grow"><div class="t">'+esc(u?u.name:'—')+' <span style="font-weight:400;color:var(--text2)">واحد '+fa(u&&u.unitNumber||'—')+'</span></div>'+
+'<div class="s">'+esc(b?b.title:'قبض حذف‌شده')+' • <span class="money">'+faMoney(r.amount)+' تومان</span>'+(r.note?'<br>📝 '+esc(r.note):'')+'</div>'+
+'<div style="margin-top:5px">'+bd+'</div></div>'+
+(r.status==='pending'?'<div style="display:flex;flex-direction:column;gap:6px"><button class="btn sm green" onclick="reviewRc(\''+r.id+'\',\'approved\')">تأیید</button><button class="btn sm red" onclick="reviewRc(\''+r.id+'\',\'rejected\')">رد</button></div>':'<button class="icon-btn" style="color:var(--red)" onclick="delReceipt(\''+r.id+'\')">🗑</button>')+
+'</div>'}).join('')}
+function reviewRc(id,st){var rcs=getReceipts(),r=rcs.find(function(x){return x.id===id});if(!r)return;
+r.status=st;save('mm_receipts',rcs);
+if(st==='approved'){var bills=getBills(),b=bills.find(function(x){return x.id===r.billId});
+if(b){b.status='paid';b.paidAt=new Date().toISOString();save('mm_bills',bills)}}
+toast(st==='approved'?'رسید تأیید شد و قبض پرداخت‌شده علامت خورد':'رسید رد شد','ok');renderView()}
+function delReceipt(id){confirmDlg('حذف رسید','این رسید حذف شود؟','حذف',function(){
+save('mm_receipts',getReceipts().filter(function(r){return r.id!==id}));toast('رسید حذف شد','ok');renderView()},true)}
+function viewImage(id){var r=getReceipts().find(function(x){return x.id===id});if(!r)return;
+modal('<div class="m-title">📸 تصویر رسید</div><img src="'+r.image+'" style="width:100%;border-radius:16px;margin-top:8px"><div class="m-actions"><button class="btn ghost" onclick="closeModal()">بستن</button></div>')}
+
+/* ---------- Calendar ---------- */
+var calSel=null;
+function vCalendar(){var t=todayJ();if(!calSel)calSel={jy:t.jy,jm:t.jm,jd:t.jd};
+var rems=getRems(),u=me();
+var first=new Date();var g=todayJ();var greg=d2g(j2d(calSel.jy,calSel.jm,1));
+var firstDow=(new Date(greg.gy,greg.gm-1,greg.gd).getDay()+1)%7; /* Saturday=0 */
+var len=jMonthLen(calSel.jy,calSel.jm);
+var out='<div class="cal"><div class="cal-head">'+
+'<button class="icon-btn" style="background:var(--primary-soft)" onclick="calMove(1)">‹</button>'+
+'<div class="m">'+J_MONTHS[calSel.jm-1]+' '+fa(calSel.jy)+'</div>'+
+'<button class="icon-btn" style="background:var(--primary-soft)" onclick="calMove(-1)">›</button></div>'+
+'<div class="cal-grid">'+J_WD.map(function(w,i){return '<div class="wd'+(i===6?' holiday':'')+'">'+w.slice(0,1)+'‌'+'</div>'}).join('');
+for(var i=0;i<firstDow;i++)out+='<div class="d other"></div>';
+for(var d=1;d<=len;d++){
+var isToday=(d===t.jd&&calSel.jm===t.jm&&calSel.jy===t.jy);
+var dayRems=rems.filter(function(r){var j=jParse(r.date);return j.jy===calSel.jy&&j.jm===calSel.jm&&j.jd===d});
+out+='<div class="d'+(isToday?' today':'')+(d===calSel.jd?' sel':'')+'" onclick="calPick('+d+')">'+fa(d)+
+(dayRems.length?'<span class="dot'+(dayRems[0].type==='personal'?' personal':'')+'"></span>':'')+'</div>'}
+out+='</div><div class="cal-legend"><span>🟠 ساختمانی</span><span>🔵 شخصی</span></div></div>';
+var selRems=rems.filter(function(r){return r.date===jStr(calSel)});
+out+='<div class="back-row" style="justify-content:space-between"><div class="section-title" style="margin:0">📌 رویدادهای '+fa(calSel.jd)+' '+J_MONTHS[calSel.jm-1]+'</div>'+
+'<button class="btn sm" style="color:#fff" onclick="openNewRem()">+ یادآوری</button></div>';
+out+=selRems.length?selRems.map(function(r){var mine=r.type==='personal'&&r.creator!==u.phone;
+return '<div class="item '+(r.type==='building'?'amber':'blue')+'"><span style="font-size:20px">'+(r.type==='building'?'🏢':'👤')+'</span>'+
+'<div class="grow"><div class="t">'+esc(r.title)+'</div><div class="s">'+(r.time?'ساعت '+fa(r.time)+' • ':'')+esc(r.description||'')+'</div></div>'+
+((isMgr()&&r.type==='building')||r.creator===u.phone?'<button class="icon-btn" style="color:var(--red)" onclick="delRem(\''+r.id+'\')">🗑</button>':'')+'</div>'}).join(''):'<div class="empty"><span class="em">📌</span>رویدادی برای این روز ثبت نشده</div>';
+return out}
+function calMove(dir){var jm=calSel.jm+dir,jy=calSel.jy;if(jm>12){jm=1;jy++}if(jm<1){jm=12;jy--}calSel={jy:jy,jm:jm,jd:1};renderView()}
+function calPick(d){calSel.jd=d;renderView()}
+function openNewRem(){var u=me();
+modal('<div class="m-title">⏰ یادآوری جدید</div><div class="m-sub">برای '+fa(calSel.jd)+' '+J_MONTHS[calSel.jm-1]+' '+fa(calSel.jy)+'</div>'+
+'<label>عنوان</label><input id="nr-title" placeholder="مثلاً: پرداخت شارژ آبان">'+
+'<label>توضیح (اختیاری)</label><input id="nr-desc" placeholder="جزئیات یادآوری">'+
+'<div class="row2"><div><label>ساعت</label><select id="nr-hour">'+Array.apply(null,Array(24)).map(function(_,h){return '<option value="'+String(h).padStart(2,'0')+'">'+fa(String(h).padStart(2,'0'))+'</option>'}).join('')+'</select></div>'+
+'<div><label>دقیقه</label><select id="nr-min"><option value="00">۰۰</option><option value="30">۳۰</option></select></div></div>'+
+'<label>نوع یادآوری</label><select id="nr-type"><option value="personal">شخصی (فقط من)</option>'+(isMgr()?'<option value="building">ساختمانی (همه ساکنین)</option>':'')+'</select>'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveNewRem()">ثبت یادآوری</button></div>')}
+function saveNewRem(){
+var title=document.getElementById('nr-title').value.trim(),desc=document.getElementById('nr-desc').value.trim(),
+h=document.getElementById('nr-hour').value,m=document.getElementById('nr-min').value,type=document.getElementById('nr-type').value;
+if(title.length<2){toast('عنوان یادآوری را وارد کنید','err');return}
+var u=me(),rems=getRems();
+rems.push({id:uid(),creator:u.phone,title:title,description:desc,date:jStr(calSel),time:h+':'+m,type:type,createdAt:new Date().toISOString()});
+save('mm_reminders',rems);closeModal();toast('یادآوری ثبت شد','ok');renderView()}
+function delRem(id){confirmDlg('حذف یادآوری','این یادآوری حذف شود؟','حذف',function(){
+save('mm_reminders',getRems().filter(function(r){return r.id!==id}));toast('حذف شد','ok');renderView()},true)}
+
+/* ---------- Announcements ---------- */
+function vAnns(){var anns=getAnns().slice().sort(function(a,b){return b.createdAt.localeCompare(a.createdAt)});
+var out='';
+if(isMgr())out+='<button class="fab" onclick="openNewAnn()">📢 اعلان جدید</button>';
+if(!anns.length)return out+'<div class="empty"><span class="em">📢</span>هنوز اعلانی منتشر نشده</div>';
+return out+anns.map(function(a){
+return '<div class="item blue" onclick="viewAnn(\''+a.id+'\')" style="cursor:pointer"><div class="grow"><div class="t">'+esc(a.title)+'</div>'+
+'<div class="s">'+esc(a.content).slice(0,90)+'...</div>'+
+'<div style="margin-top:6px"><span class="badge b-blue">'+esc(a.type)+'</span></div></div></div>'}).join('')}
+function viewAnn(id){var a=getAnns().find(function(x){return x.id===id});if(!a)return;
+modal('<div class="m-title">'+esc(a.title)+'</div><div class="m-sub"><span class="badge b-blue">'+esc(a.type)+'</span></div>'+
+'<p style="font-size:14px;line-height:2.2;color:#334155;white-space:pre-wrap">'+esc(a.content)+'</p>'+
+'<div class="m-actions">'+(isMgr()?'<button class="btn red" onclick="delAnn(\''+a.id+'\')">حذف</button>':'')+'<button class="btn ghost" onclick="closeModal()">بستن</button></div>')}
+function openNewAnn(){modal('<div class="m-title">📢 اعلان جدید</div>'+
+'<label>عنوان</label><input id="na-title" placeholder="مثلاً: جلسه ماهانه اولیای ساختمان">'+
+'<label>متن اعلان</label><textarea id="na-content" placeholder="متن کامل اعلان را بنویسید..."></textarea>'+
+'<label>دسته‌بندی</label><select id="na-type"><option>اطلاعیه</option><option>هشدار</option><option>جلسه</option><option>نگهبانی</option><option>خدمات</option></select>'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveNewAnn()">انتشار</button></div>')}
+function saveNewAnn(){
+var t=document.getElementById('na-title').value.trim(),c=document.getElementById('na-content').value.trim();
+if(t.length<2||c.length<3){toast('عنوان و متن اعلان را کامل وارد کنید','err');return}
+var anns=getAnns();anns.push({id:uid(),title:t,content:c,type:document.getElementById('na-type').value,createdAt:new Date().toISOString()});
+save('mm_anns',anns);closeModal();toast('اعلان منتشر شد','ok');renderView()}
+function delAnn(id){confirmDlg('حذف اعلان','این اعلان حذف شود؟','حذف',function(){
+save('mm_anns',getAnns().filter(function(a){return a.id!==id}));closeModal();toast('حذف شد','ok');renderView()},true)}
+
+/* ---------- Residents ---------- */
+var resQuery='';
+function vResidents(){var accs=getAccs(),u=me();
+var list=accs.slice().sort(function(a,b){return(a.unitNumber||999)-(b.unitNumber||999)});
+var q=resQuery.trim();
+if(q)list=list.filter(function(a){return a.name.indexOf(q)>-1||a.phone.indexOf(enDigits(q))>-1});
+var out='<div class="searchbox"><input placeholder="جستجوی نام یا شماره موبایل..." value="'+esc(resQuery)+'" oninput="resQuery=this.value;renderView()"><span class="em">🔍</span></div>';
+if(isMgr())out+='<button class="fab" onclick="openAddResident()">👥 افزودن عضو</button>';
+if(!list.length)return out+'<div class="empty"><span class="em">👥</span>عضوی پیدا نشد</div>';
+return out+list.map(function(a){
+var isMe=a.phone===u.phone;
+var stB=a.status==='active'?'<span class="badge b-green">فعال</span>':a.status==='unassigned'?'<span class="badge b-amber">در انتظار تأیید</span>':'<span class="badge b-gray">غیرفعال</span>';
+var roleB=a.role==='manager'?'<span class="badge b-blue">👑 مدیر</span>':'';
+return '<div class="item'+(a.status==='unassigned'?' amber':'')+'"><div class="avatar">'+esc((a.name||'?').charAt(0))+'</div>'+
+'<div class="grow"><div class="t">'+esc(a.name)+(isMe?' <span class="badge b-gray">شما</span>':'')+' '+roleB+'</div>'+
+'<div class="s" style="direction:ltr;text-align:right">'+fa(a.phone)+(a.unitNumber?' • واحد '+fa(a.unitNumber)+(a.floor?' طبقه '+fa(a.floor):''):'')+'</div>'+
+'<div style="margin-top:5px">'+stB+'</div></div>'+
+(isMe?'':'<button class="icon-btn" style="color:var(--primary);background:var(--primary-soft)" onclick="openMemberMenu(\''+a.phone+'\')">⋮</button>')+
+'</div>'}).join('')}
+function openMemberMenu(phone){var u=me(),a=getAccs().find(function(x){return x.phone===phone});if(!a)return;
+modal('<div class="m-title">'+esc(a.name)+'</div><div class="m-sub" style="direction:ltr;text-align:right">'+fa(a.phone)+'</div>'+
+'<div style="display:flex;flex-direction:column;gap:9px">'+
+(a.role==='resident'?'<button class="btn ghost" onclick="closeModal();assignUnit(\''+phone+'\')">🏠 تخصیص واحد و طبقه</button>'+
+'<button class="btn ghost" onclick="closeModal();resetPass(\''+phone+'\')">🔑 بازنشانی رمز عبور</button>'+
+'<button class="btn ghost" onclick="closeModal();transferMgr(\''+phone+'\')">👑 ارتقا به مدیر (انتقال مدیریت)</button>':'<div class="hint">این کاربر مدیر ساختمان است</div>')+
+'<button class="btn red" onclick="closeModal();delResident(\''+phone+'\')">🗑 حذف عضو</button>'+
+'<button class="btn gray" onclick="closeModal()">بستن</button></div>')}
+function openAddResident(){var B=getB();
+var units='<option value="">— بدون واحد —</option>';for(var i=1;i<=+B.units;i++)units+='<option value="'+i+'">واحد '+fa(i)+'</option>';
+modal('<div class="m-title">👥 افزودن عضو ساختمان</div><div class="m-sub">عضو با همین شماره موبایل وارد اپ می‌شود</div>'+
+'<label>نام و نام خانوادگی</label><input id="ar-name" placeholder="مثلاً: سارا محمدی">'+
+'<label>شماره موبایل</label><input id="ar-phone" type="tel" inputmode="numeric" dir="ltr" style="text-align:right" placeholder="09121234567">'+
+'<div class="row2"><div><label>واحد</label><select id="ar-unit">'+units+'</select></div>'+
+'<div><label>طبقه (اختیاری)</label><input id="ar-floor" type="tel" inputmode="numeric" placeholder="۲"></div></div>'+
+'<label>رمز عبور اولیه</label><input id="ar-pass" value="1234" placeholder="رمز اولیه عضو">'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveAddResident()">افزودن عضو</button></div>')}
+function saveAddResident(){
+var name=document.getElementById('ar-name').value.trim(),phone=normalizePhone(document.getElementById('ar-phone').value),
+unit=document.getElementById('ar-unit').value,floor=+enDigits(document.getElementById('ar-floor').value)||null,
+pass=document.getElementById('ar-pass').value||'1234';
+if(name.length<2){toast('نام را وارد کنید','err');return}
+if(!phone){toast('شماره موبایل معتبر نیست','err');return}
+var accs=getAccs();
+if(accs.some(function(a){return a.phone===phone})){toast('این شماره قبلاً ثبت شده است','err');return}
+accs.push({id:uid(),name:name,phone:phone,pass:pass,role:'resident',unitNumber:unit?+unit:null,floor:floor,status:unit?'active':'unassigned',createdAt:new Date().toISOString()});
+save('mm_accounts',accs);closeModal();toast('عضو اضافه شد','ok');renderView()}
+function assignUnit(phone){var a=getAccs().find(function(x){return x.phone===phone}),B=getB();
+var units='<option value="">— بدون واحد —</option>';for(var i=1;i<=+B.units;i++)units+='<option value="'+i+'" '+(a.unitNumber===i?'selected':'')+'>واحد '+fa(i)+'</option>';
+modal('<div class="m-title">🏠 تخصیص واحد</div><div class="m-sub">'+esc(a.name)+'</div>'+
+'<label>واحد</label><select id="au-unit">'+units+'</select>'+
+'<label>طبقه</label><input id="au-floor" type="tel" inputmode="numeric" value="'+(a.floor||'')+'">'+
+'<label>وضعیت</label><select id="au-status"><option value="active" '+(a.status==='active'?'selected':'')+'>فعال</option><option value="unassigned" '+(a.status==='unassigned'?'selected':'')+'>در انتظار تأیید</option><option value="inactive" '+(a.status==='inactive'?'selected':'')+'>غیرفعال</option></select>'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveAssign(\''+phone+'\')">ذخیره</button></div>')}
+function saveAssign(phone){var accs=getAccs(),a=accs.find(function(x){return x.phone===phone});if(!a)return;
+a.unitNumber=+document.getElementById('au-unit').value||null;
+a.floor=+enDigits(document.getElementById('au-floor').value)||null;
+a.status=document.getElementById('au-status').value;
+save('mm_accounts',accs);closeModal();toast('اطلاعات عضو بروزرسانی شد','ok');renderView()}
+function transferMgr(phone){var a=getAccs().find(function(x){return x.phone===phone});
+confirmDlg('👑 انتقال مدیریت ساختمان','با تأیید این عمل، «'+a.name+'» مدیر جدید ساختمان می‌شود و دسترسی شما به ساکن تغییر می‌کند. مطمئنید؟','انتقال مدیریت',function(){
+var accs=getAccs();
+accs.forEach(function(x){x.role=x.phone===phone?'manager':'resident'});
+save('mm_accounts',accs);toast('مدیریت به '+a.name+' منتقل شد 👑','ok');render()},true)}
+function delResident(phone){var a=getAccs().find(function(x){return x.phone===phone});
+confirmDlg('حذف عضو','«'+a.name+'» و تمام داده‌های مرتبط با او حذف می‌شود. این عمل قابل بازگشت نیست!','حذف',function(){
+var rcs=getReceipts().filter(function(r){return r.by!==phone});save('mm_receipts',rcs);
+save('mm_reminders',getRems().filter(function(r){return r.creator!==phone}));
+save('mm_accounts',getAccs().filter(function(x){return x.phone!==phone}));
+toast('عضو حذف شد','ok');renderView()},true)}
+function resetPass(phone){var a=getAccs().find(function(x){return x.phone===phone});
+var temp=String(Math.floor(100000+Math.random()*900000));
+var accs=getAccs(),x=accs.find(function(y){return y.phone===phone});x.pass=temp;save('mm_accounts',accs);
+modal('<div class="m-title">🔑 رمز جدید ساخته شد</div><div class="m-sub">این رمز را به «'+esc(a.name)+'» بگویید تا با آن وارد شود و از پروفایل رمزش را عوض کند</div>'+
+'<div class="cardnum">'+fa(temp)+'</div>'+
+'<div class="m-actions"><button class="btn" style="flex:1" onclick="copyText(\''+temp+'\',\'رمز کپی شد\')">📋 کپی رمز</button><button class="btn ghost" onclick="closeModal()">بستن</button></div>')}
+
+/* ---------- Requests ---------- */
+var reqFilter='all';
+function reqStatusFa(s){return s==='open'?'در حال بررسی':s==='done'?'انجام شده':s}
+function vRequests(){var u=me(),reqs=getReqs().slice().sort(function(a,b){return b.createdAt.localeCompare(a.createdAt)});
+var out='<div class="back-row"><button onclick="tab=\'dash\';renderView();renderNav()">‹ بازگشت به داشبورد</button></div>'+
+'<div class="chips">'+[['all','همه'],['open','در حال بررسی'],['done','انجام شده']].map(function(s){
+return '<button class="chip '+(reqFilter===s[0]?'on':'')+'" onclick="reqFilter=\''+s[0]+'\';renderView()">'+s[1]+'</button>'}).join('')+'</div>'+
+'<button class="fab" onclick="openNewReq()">🔧 درخواست جدید</button>';
+var list=reqs.filter(function(r){return u.role==='manager'||r.unitNumber===u.unitNumber}).filter(function(r){return reqFilter==='all'||r.status===reqFilter});
+if(!list.length)return out+'<div class="empty"><span class="em">🔧</span>درخواستی در این بخش نیست</div>';
+return out+list.map(function(r){
+var pr=r.priority==='high'?'<span class="badge b-red">اولویت بالا</span>':r.priority==='medium'?'<span class="badge b-amber">اولویت متوسط</span>':'<span class="badge b-gray">اولویت کم</span>';
+return '<div class="item '+(r.status==='done'?'green':r.priority==='high'?'red':'blue')+'"><span style="font-size:20px">🔧</span>'+
+'<div class="grow"><div class="t">'+esc(r.title)+'</div><div class="s">'+esc(r.description)+'</div>'+
+'<div style="margin-top:6px">واحد '+fa(r.unitNumber||'—')+' • '+esc(r.category)+' '+pr+' <span class="badge '+(r.status==='done'?'b-green':'b-blue')+'">'+reqStatusFa(r.status)+'</span></div></div>'+
+(isMgr()&&r.status!=='done'?'<button class="btn sm green" onclick="doneReq(\''+r.id+'\')">انجام شد</button>':'')+
+(isMgr()?'<button class="icon-btn" style="color:var(--red)" onclick="delReq(\''+r.id+'\')">🗑</button>':'')+
+'</div>'}).join('')}
+function openNewReq(){var u=me();
+modal('<div class="m-title">🔧 درخواست تعمیرات</div>'+
+'<label>عنوان</label><input id="nq-title" placeholder="مثلاً: خرابی دریب برق راهرو">'+
+'<label>توضیحات</label><textarea id="nq-desc" placeholder="شرح مشکل را بنویسید..."></textarea>'+
+'<label>دسته‌بندی</label><select id="nq-cat"><option>برقی</option><option>لوله‌کشی</option><option>نظافت</option><option>موتورخانه</option><option>آسانسور</option><option>سایر</option></select>'+
+'<label>اولویت</label><select id="nq-pr"><option value="low">کم</option><option value="medium" selected>متوسط</option><option value="high">بالا</option></select>'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveNewReq()">ثبت درخواست</button></div>')}
+function saveNewReq(){var u=me();
+var t=document.getElementById('nq-title').value.trim(),d=document.getElementById('nq-desc').value.trim();
+if(t.length<3){toast('عنوان درخواست را وارد کنید','err');return}
+var reqs=getReqs();reqs.push({id:uid(),title:t,description:d,unitNumber:u.unitNumber,category:document.getElementById('nq-cat').value,priority:document.getElementById('nq-pr').value,status:'open',createdAt:new Date().toISOString()});
+save('mm_requests',reqs);closeModal();toast('درخواست ثبت شد','ok');renderView()}
+function doneReq(id){var reqs=getReqs(),r=reqs.find(function(x){return x.id===id});r.status='done';save('mm_requests',reqs);toast('انجام‌شده علامت خورد','ok');renderView()}
+function delReq(id){confirmDlg('حذف درخواست','این درخواست حذف شود؟','حذف',function(){
+save('mm_requests',getReqs().filter(function(r){return r.id!==id}));toast('حذف شد','ok');renderView()},true)}
+
+/* ---------- Settings / Profile / Backup ---------- */
+function groupCard(n){n=String(n);return n.replace(/(.{4})/g,'$1 ').trim()}
+function openSettings(){var B=getB();
+modal('<div class="m-title">⚙️ تنظیمات ساختمان و پرداخت</div>'+
+'<label>نام ساختمان</label><input id="st-name" value="'+esc(B.name)+'">'+
+'<label>آدرس</label><input id="st-addr" value="'+esc(B.address||'')+'">'+
+'<label>تعداد واحد</label><input id="st-units" type="tel" inputmode="numeric" value="'+fa(B.units)+'">'+
+'<label>شماره کارت (۱۶ تا ۱۹ رقم)</label><input id="st-card" type="tel" inputmode="numeric" dir="ltr" style="text-align:right" value="'+esc(B.cardNumber||'')+'" oninput="this.value=enDigits(this.value).replace(/\\D/g,\'\')">'+
+'<label>نام صاحب کارت</label><input id="st-holder" value="'+esc(B.cardHolder||'')+'">'+
+'<label>شماره شبا</label><input id="st-sheba" dir="ltr" style="text-align:right" value="'+esc(B.sheba||'')+'" placeholder="IR...">'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveSettings()">ذخیره</button></div>')}
+function saveSettings(){var B=getB();
+var name=document.getElementById('st-name').value.trim(),
+addr=document.getElementById('st-addr').value.trim(),
+units=+enDigits(document.getElementById('st-units').value),
+card=document.getElementById('st-card').value.trim(),
+holder=document.getElementById('st-holder').value.trim(),
+sheba=document.getElementById('st-sheba').value.trim().toUpperCase().replace(/\s/g,'');
+if(name.length<2){toast('نام ساختمان را وارد کنید','err');return}
+if(units<1){toast('تعداد واحد معتبر نیست','err');return}
+if(card&&(!/^\d{12,19}$/.test(card))){toast('شماره کارت باید ۱۲ تا ۱۹ رقم باشد','err');return}
+if(sheba&&!/^IR\d{22,26}$/.test(sheba)){toast('شماره شبا باید با IR شروع شود و ۲۴ تا ۲۸ کاراکتر باشد','err');return}
+B.name=name;B.address=addr;B.units=units;B.cardNumber=card;B.cardHolder=holder;B.sheba=sheba;
+if(store('mm_building',B)){closeModal();toast('تنظیمات ذخیره شد','ok');render()}}
+function openProfile(){var u=me();
+modal('<div class="m-title">👤 پروفایل من</div>'+
+'<label>نام و نام خانوادگی</label><input id="pf-name" value="'+esc(u.name)+'">'+
+'<label>شماره موبایل (شناسه ورود)</label><input id="pf-phone" type="tel" inputmode="numeric" dir="ltr" style="text-align:right" value="'+fa(u.phone)+'" disabled style="opacity:.6">'+
+'<label>طبقه</label><input id="pf-floor" type="tel" inputmode="numeric" value="'+(u.floor||'')+'">'+
+'<hr style="border:none;border-top:1.5px solid var(--line);margin:16px 0">'+
+'<div class="m-title" style="font-size:14px">🔒 تغییر رمز عبور</div>'+
+'<label>رمز فعلی</label><input id="pf-cur" type="password">'+
+'<label>رمز جدید</label><input id="pf-new" type="password">'+
+'<div class="m-actions"><button class="btn gray" onclick="closeModal()">انصراف</button><button class="btn" onclick="saveProfile()">ذخیره</button></div>')}
+function saveProfile(){var u=me(),accs=getAccs(),a=accs.find(function(x){return x.phone===u.phone});
+var name=document.getElementById('pf-name').value.trim(),floor=+enDigits(document.getElementById('pf-floor').value)||null;
+var cur=document.getElementById('pf-cur').value,neu=document.getElementById('pf-new').value;
+if(name.length<2){toast('نام را وارد کنید','err');return}
+a.name=name;a.floor=floor;
+if(cur||neu){if(a.pass!==cur){toast('رمز فعلی اشتباه است','err');return}
+if(neu.length<6){toast('رمز جدید باید حداقل ۶ کاراکتر باشد','err');return}
+a.pass=neu}
+save('mm_accounts',accs);closeModal();toast('پروفایل ذخیره شد','ok');render()}
+function openBackup(){var data={};['mm_building','mm_accounts','mm_bills','mm_receipts','mm_anns','mm_requests','mm_reminders','mm_setup'].forEach(function(k){data[k]=store(k)});
+var json=JSON.stringify(data);
+modal('<div class="m-title">💾 پشتیبان‌گیری و بازیابی</div>'+
+'<div class="m-sub">از تمام اطلاعات اپ یک فایل پشتیبان می‌سازد. آن را در جایی امن (واتساپ خودتان، ایمیل، یادداشت‌ها) نگه دارید.</div>'+
+'<div class="m-actions" style="margin-top:8px"><button class="btn" style="flex:1" onclick="copyText(document.getElementById(\'bk-json\').value,\'پشتیبان کپی شد — در جایی امن ذخیره کنید\')">📋 کپی پشتیبان</button>'+
+'<button class="btn ghost" style="flex:1" onclick="shareBackup()">📤 اشتراک‌گذاری</button></div>'+
+'<textarea id="bk-json" style="height:110px;font-size:11px;direction:ltr;margin-top:12px" readonly>'+esc(json)+'</textarea>'+
+'<hr style="border:none;border-top:1.5px solid var(--line);margin:14px 0">'+
+'<div class="m-title" style="font-size:14px">♻️ بازیابی از پشتیبان</div>'+
+'<label>فایل پشتیبان (.json)</label><input type="file" id="bk-file" accept=".json,application/json" onchange="restoreBackup(this)">'+
+'<hr style="border:none;border-top:1.5px solid var(--line);margin:14px 0">'+
+'<div class="m-actions"><button class="btn red" style="flex:1" onclick="resetAll()">⚠️ پاک‌کردن همه داده‌ها</button></div>')}
+function shareBackup(){var json=document.getElementById('bk-json').value;
+try{if(window.AndroidBridge&&AndroidBridge.shareText){AndroidBridge.shareText('پشتیبان مدیرمن',json);return}}catch(e){}
+copyText(json,'پشتیبان کپی شد — در جایی امن ذخیره کنید')}
+function restoreBackup(input){var f=input.files&&input.files[0];if(!f)return;
+var fr=new FileReader();
+fr.onload=function(){try{var data=JSON.parse(fr.result);
+if(!data.mm_building||!data.mm_accounts){toast('فایل پشتیبان معتبر نیست','err');return}
+confirmDlg('بازیابی پشتیبان','تمام داده‌های فعلی با اطلاعات پشتیبان جایگزین می‌شود. ادامه می‌دهید؟','بازیابی',function(){
+Object.keys(data).forEach(function(k){store(k,data[k])});
+toast('اطلاعات بازیابی شد ✅','ok');setTimeout(function(){location.reload()},800)},true)}catch(e){toast('فایل پشتیبان معتبر نیست','err')}};
+fr.readAsText(f)}
+function resetAll(){confirmDlg('⚠️ پاک‌کردن همه داده‌ها','تمام ساکنین، قبض‌ها، رسیدها و تنظیمات برای همیشه حذف می‌شود. این عمل قابل بازگشت نیست!','همه را پاک کن',function(){
+['mm_building','mm_accounts','mm_bills','mm_receipts','mm_anns','mm_requests','mm_reminders','mm_session','mm_setup'].forEach(function(k){localStorage.removeItem(k)});
+location.reload()},true)}
+
+/* ---------- Clipboard ---------- */
+function copyText(text,msg){
+try{if(window.AndroidBridge&&AndroidBridge.copy){AndroidBridge.copy(text);toast(msg||'کپی شد','ok');return}}catch(e){}
+if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){toast(msg||'کپی شد','ok')}).catch(function(){fallbackCopy(text,msg)})}
+else fallbackCopy(text,msg)}
+function fallbackCopy(text,msg){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();
+try{document.execCommand('copy');toast(msg||'کپی شد','ok')}catch(e){toast('کپی نشد — دستی کپی کنید','err')}
+ta.remove()}
+
+/* ---------- Reminder engine (in-app) ---------- */
+var _notified={};
+function checkReminders(){var u=me();if(!u)return;
+var t=jStr(todayJ()),rems=getRems().filter(function(r){return r.date===t&&(r.type==='building'||r.creator===u.phone)});
+rems.forEach(function(r){if(_notified[r.id])return;_notified[r.id]=1;
+toast('⏰ یادآوری: '+r.title,'ok');
+try{if(window.Notification&&Notification.permission==='granted'){new Notification('مدیرمن — '+r.title,{body:r.description||''})}}catch(e){}})}
+setInterval(checkReminders,60000);
+
+/* ---------- Boot ---------- */
+(function(){
+var u=me();
+if(u){enterApp();checkReminders()}else renderAuth();
+try{if(window.Notification&&Notification.permission==='default'){Notification.requestPermission()}}catch(e){}
+})();
+</script>
+</body>
+</html>
