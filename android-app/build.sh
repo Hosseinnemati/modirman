@@ -27,6 +27,7 @@ echo "1/6 کامپایل منابع (aapt package)..."
 "$BT/aapt" package -f -m \
     -M AndroidManifest.xml \
     -S res \
+    -A assets \
     -I "$PLATFORM" \
     -F "$OUT/resources.ap_"
 
