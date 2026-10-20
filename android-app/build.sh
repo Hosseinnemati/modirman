@@ -7,13 +7,19 @@
 set -e
 cd "$(dirname "$0")"
 
-SDK="${ANDROID_SDK:-$HOME/android-sdk}"
+# تشخیص خودکار مسیر SDK: متغیر ANDROID_SDK، سپس ANDROID_HOME (گیت‌هاب اکشنز)، سپس مسیر محلی
+SDK="${ANDROID_SDK:-${ANDROID_HOME:-$HOME/android-sdk}}"
 BT="$SDK/build-tools/34.0.0"
 PLATFORM="$SDK/platforms/android-34/android.jar"
 OUT="build"
+VERSION="1.1"
 
 KS="keystore/modirman.keystore"
 KS_PASS="modirman123"
+
+echo "استفاده از SDK: $SDK"
+[ -d "$BT" ] || { echo "خطا: build-tools 34.0.0 در $SDK پیدا نشد"; exit 1; }
+[ -f "$PLATFORM" ] || { echo "خطا: platforms;android-34 در $SDK پیدا نشد"; exit 1; }
 
 mkdir -p "$OUT/classes" "$OUT/dex"
 
@@ -27,7 +33,8 @@ echo "1/6 کامپایل منابع (aapt package)..."
 echo "2/6 کامپایل جاوا..."
 SOURCES=$(find java -name "*.java")
 if command -v javac >/dev/null 2>&1; then
-    javac -source 17 -target 17 -classpath "$PLATFORM" -d "$OUT/classes" $SOURCES
+    javac -source 8 -target 8 -encoding UTF-8 -Xlint:-options \
+        -classpath "$PLATFORM" -d "$OUT/classes" $SOURCES
 elif [ -f "$SDK/ecj.jar" ]; then
     # کامپایلر Eclipse — با JRE ساده هم کار می‌کند
     java -jar "$SDK/ecj.jar" -source 8 -target 8 -encoding UTF-8 \
@@ -59,9 +66,9 @@ if [ ! -f "$KS" ]; then
 fi
 "$BT/apksigner" sign --ks "$KS" \
     --ks-pass "pass:$KS_PASS" --key-pass "pass:$KS_PASS" \
-    --out "modirman-v1.0.apk" "$OUT/aligned.apk"
+    --out "modirman-v$VERSION.apk" "$OUT/aligned.apk"
 
-"$BT/apksigner" verify --print-certs "modirman-v1.0.apk" | head -3
+"$BT/apksigner" verify --print-certs "modirman-v$VERSION.apk" | head -3
 echo ""
-echo "✅ APK آماده شد: android-app/modirman-v1.0.apk"
+echo "✅ APK آماده شد: android-app/modirman-v$VERSION.apk"
 echo "⚠️  فایل keystore/modirman.keystore را نگه دارید — برای بروزرسانی‌های بعدی بازار به همان امضا نیاز است"

@@ -42,6 +42,14 @@ private static final String START_URL = OFFLINE_URL;   // حال فعلی (آف�
 و آدرس `ONLINE_URL` را تغییر دهید، سپس دوباره بسازید.
 
 ## ساخت مجدد APK
+
+### روش ۱ — با GitHub Actions (بدون نیاز به هیچ نصبی — پیشنهادی) 🤖
+سورس را push کنید؛ سرورهای گیت‌هاب خودشان APK را کامپایل، امضا و منتشر می‌کنند:
+- **خروجی هر اجرا:** تب **Actions** ← آخرین اجرا ← بخش **Artifacts** ← `modirman-apk-…`
+- **دانلود مستقیم همیشگی:** ریلیز [`latest`](https://github.com/Hosseinnemati/modirman/releases/latest) (هر ساخت جدید، فایل آن بروز می‌شود)
+- اجرای دستی: تب Actions ← «ساخت APK مدیرمن» ← **Run workflow**
+
+### روش ۲ — ساخت محلی روی سیستم خودتان
 پیش‌نیاز: JDK 17+ (یا فقط JRE + فایل `ecj.jar` کنار SDK) و build-tools 34 + platform android-34
 
 ```bash

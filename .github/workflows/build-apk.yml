@@ -1,0 +1,81 @@
+# ============================================================
+# ساخت خودکار APK مدیرمن با GitHub Actions
+#
+# ▸ اجرای دستی:  تب Actions ← «ساخت APK مدیرمن» ← Run workflow
+# ▸ اجرای خودکار: هر push به main که پوشه android-app را تغییر دهد
+# ▸ دانلود خروجی:  تب Actions ← آخرین اجرا ← Artifacts ← modirman-apk
+#   (همچنین در بخش Releases، ریلیز «latest» همیشه آخرین APK را دارد)
+# ============================================================
+name: ساخت APK مدیرمن
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "android-app/**"
+      - ".github/workflows/build-apk.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: کامپایل و امضای APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: دریافت سورس کد
+        uses: actions/checkout@v4
+
+      - name: نصب JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: نصب اجزای Android SDK (build-tools 34 + platform 34)
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null
+
+      - name: ساخت APK (aapt ← javac ← d8 ← zipalign ← apksigner)
+        working-directory: android-app
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: بررسی اطلاعات APK ساخته‌شده
+        run: |
+          APK=$(ls android-app/modirman-v*.apk | head -1)
+          echo "فایل: $APK"
+          ls -lh "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | head -3
+
+      - name: آپلود Artifact — دانلود از تب Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: modirman-apk-${{ github.run_number }}
+          path: android-app/modirman-v*.apk
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: انتشار در ریلیز «latest» — دانلود مستقیم
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APK=$(ls android-app/modirman-v*.apk | head -1)
+          gh release delete latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create latest "$APK" \
+            --title "مدیرمن — آخرین نسخه APK (ساخت خودکار)" \
+            --latest \
+            --notes "دانلود مستقیم آخرین نسخه نصبی مدیرمن — این ریلیز به‌صورت خودکار با GitHub Actions ساخته و بروزرسانی می‌شود.
+
+          ▸ پس از دانلود، فایل را باز کنید و اجازه «نصب از منابع ناشناس» را بدهید.
+          ▸ نسخه ۱.۱ کاملاً آفلاین است — همه داده‌ها روی حافظه گوشی ذخیره می‌شود.
+          ▸ از منوی داخل اپ می‌توانید از اطلاعات خود پشتیبان JSON بگیرید."
