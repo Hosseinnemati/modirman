@@ -41,8 +41,21 @@ jobs:
 
       - name: نصب اجزای Android SDK (build-tools 34 + platform 34)
         run: |
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null
+          # در ایمیج‌های جدید رانر، sdkmanager در PATH نیست — از مسیر کامل استفاده می‌کنیم
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKM" ]; then
+            SDKM="$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f 2>/dev/null | head -1 || true)"
+          fi
+          if [ -n "$SDKM" ] && [ -x "$SDKM" ]; then
+            echo "sdkmanager: $SDKM"
+            yes | "$SDKM" --licenses > /dev/null 2>&1 || true
+            "$SDKM" "platforms;android-34" "build-tools;34.0.0"
+          else
+            echo "⚠️ sdkmanager پیدا نشد — فرض بر نصب‌بودن اجزا از قبل"
+          fi
+          echo "── اعتبارسنجی اجزا ──"
+          test -f "$ANDROID_HOME/platforms/android-34/android.jar" && echo "✓ platform android-34"
+          test -d "$ANDROID_HOME/build-tools/34.0.0" && echo "✓ build-tools 34.0.0"
 
       - name: ساخت APK (aapt ← javac ← d8 ← zipalign ← apksigner)
         working-directory: android-app
